@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  lang="ko">
+<head>
+	<title>Error</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+	<link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+		  th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}"
+		  rel="stylesheet" media="screen" />
+</head>
+<body>
+	<div class="container">
+		<h1 th:text="${title}">제목</h1>
+
+		<div id="created" th:text="${#dates.format(timestamp)}">날짜</div>
+
+		<div>
+			There was an unexpected error (type=<span th:text="${error}">Bad</span>, status=<span th:text="${status}">500</span>).
+		</div>
+
+		<div th:text="${message}">에러 메세지</div>
+
+		<div>
+			에러가 발생하였습니다. 관리자에게 문의해 주시기 바랍니다.
+		</div>
+	</div>
+</body>
+</html>

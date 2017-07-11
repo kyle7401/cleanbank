@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>고객 찾기</title>
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="/webjars//js-grid/1.2.0/dist/jsgrid.min.css" rel="stylesheet" media="screen" />
+    <link href="/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css" rel="stylesheet" media="screen" />
+    <script src="/webjars/js-grid/1.2.0/dist/jsgrid.min.js"></script>
+
+    <link href="/css/mem_search.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript">
+    /*<![CDATA[*/
+
+        $(document).ready(function(){
+            init();
+        });
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+                width: '100%',
+                height: 'auto',
+                paging: true,
+                pageSize: 5,
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function (args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    {name: 'bnNm', title: '지점', type: 'text', align: 'center'},
+                    {name: 'mbEmail', title: '고객 아이디', type: 'text', align: 'center'},
+                    {name: 'mbNicNm', title: '닉네임', type: 'text', align: 'center'},
+                    {name: 'mbTel', title: '연락처', type: 'text', align: 'center'}
+                ]
+            });
+
+            var showDetailsDialog = function (dialogType, client) {
+                var vNicNm = client.mbNicNm;
+                if(!confirm(vNicNm +' 님을 선택하시겠습니까?')) return false;
+
+                var vMbCd = client.mbCd;
+                var vMbTel = client.mbTel;
+                var vMbEmail = client.mbEmail;
+
+//                저장처리
+                window.parent.fnSetMbrInfo(vMbCd, vNicNm, vMbTel, vMbEmail);
+                parent.jQuery.fancybox.close();
+            };
+        });
+
+//    http://warmz.tistory.com/739
+        (function() {
+            var db = {
+
+                loadData: function(filter) {
+                    var d = $.Deferred();
+    //                    filter.bnCd = $('#regfrm #bnCd').val();
+    //                alert(filter.q);
+
+                    $.ajax({
+                        url: '/member/list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+//                        console.log(response.channel.item);
+//                        d.resolve(response.content);
+                        d.resolve(response);
+                    });
+
+                    return d.promise();
+                }
+            };
+
+            window.db = db;
+        }());
+
+        function fnSearch() {
+            $('#jsGrid').jsGrid('search', { condition:  $('#condition').val(), keyword:  $('#keyword').val() });
+        }
+
+        function init() {
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+        }
+    /*]]>*/
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content">
+    <h2 class="page_title pop">고객 찾기</h2>
+
+    <div class="mem_search">
+            <select id="condition">
+                <option value="N">닉네임</option>
+                <option value="T">전화번호</option>
+            </select>
+
+            <input type="text" class="default" id="keyword" />
+
+            <button id="btnSearch">찾기</button>
+
+            <div id="jsGrid" class="table_area"></div>
+
+            <div class="btn_group">
+                <!--<a class="close_btn" id="btnSave">저장</a>
+                <a class="close_btn" id="btnDelete">삭제</a>-->
+                <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+            </div>
+        </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>크린매니저정보</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="/css/file_input.css" rel="stylesheet" type="text/css" />
+    <style>
+        div.error {position: absolute;background-color: transparent;top: 11px;text-align: right;}
+        .pop_input_area .col {position: relative;}
+        .col.harf div.error {left: -180px;width: 110px;}
+        .col.harf.long div.error {left: -245px;top: -45px; width: 110px; line-height: 135%;}
+    </style>
+
+    <script type="text/javascript" src="/js/additional-methods.min.js"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).ready(function(){
+            init();
+            $( '#bnCd' ).trigger( 'change' );
+//            test();
+        });
+
+        function test() {
+            $('#epEmail').val('test1@synapsetech.co.kr');
+            $('#epPass').val('1111');
+            $('#epNm').val('test1');
+            $('#epJoinDt').val('2015-11-10');
+            $('#regiDt').val('2015-11-23');
+            $('#epTel').val('010-1234-5678');
+            $('#epIntro').val('자기소개 자기소개 자기소개');
+        }
+
+        function init() {
+            makeDatepicker2('.pop_input_area .input-group.date');
+
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });
+
+            $('#btnDelete').click(function () {
+//                alert( 'id '+ $('#id').val() +' 삭제!' );
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.fancybox.showLoading();
+
+                var vNo = $('#epCd').val();
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/employee/delete-user',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        //pageReload();
+                        $.fancybox.hideLoading();
+//                        $.fancybox.close();
+                        parent.jQuery.fancybox.close();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                        $.fancybox.hideLoading();
+                    }
+                });
+            });
+
+            // 담당지역
+            $('#bnCd').change(function() {
+                var vBnCd = $(this).val();
+//                alert(vBnCd);
+                $('#epLoc').load('/etc/getTbBranchLocsByBnCd', {bnCd: vBnCd}, function() {
+//                    alert($("#epLoc option").size());
+//                    alert([[${employee.epLoc}]]);
+                    if([[${employee.epLoc}]])  $('#epLoc').val([[${employee.epLoc}]]);
+                 });
+            });
+        }
+
+        $(function(){
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+
+                rules: {
+                    'epEmail' : {
+                        required : true,
+                        minlength : 4
+                    },
+                    'epPass' : {
+                        required : true,
+                        minlength : 4
+                    },
+                    'newPass' : {
+                        minlength : 4
+                    },
+                    'epNm' : {
+                        required : true,
+                        minlength : 2
+                    },
+                    'epTel' : {
+                        minlength : 4
+                    },
+                    'epJoinDt' : {
+                        required : true
+//                        minlength : 8
+                    },
+                    'bnCd' : {
+                        required : true
+                    },
+                    'epIntro' : {
+                        maxlength : 1000
+                    }
+                },
+
+                messages : {
+                    'epEmail' : {
+                        required : "아이디를 입력해 주세요.",
+                        minlength : "아이디는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'epPass' : {
+                        required : "암호를 입력해 주세요.",
+                        minlength : "암호는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'newPass' : {
+                        minlength : "암호는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'epNm' : {
+                        required : "성명을 입력해 주세요.",
+                        minlength : "성명은 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'epTel' : {
+                        required : "연락처를 입력해 주세요."
+                    },
+                    'epJoinDt' : {
+                        required : "입사일자를 선택해 주세요."
+                    },
+                    'bnCd' : {
+                        required : "지점을 선택해 주세요."
+                    },
+                    'epIntro' : {
+                        maxlength : "자기소개는 최대 {0}글자 이하 입력해 주세요."
+                    }
+                },
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        if (element.attr('name') == 'epJoinDt') {
+                            error.insertAfter('.input-group.date');
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+            });
+
+//        신규일때만 email 중복체크및 사진 업로드
+            if($('#regfrm > #mode').val() == 'new') {
+
+                $('#epEmail').rules('add', {
+                    remote: "/employee/check-email",
+                    messages: {
+                        remote: "이미 사용중인 email 주소 입니다!"
+                    }
+                });
+
+                $('#imgfile').rules("add", {
+                    required: true,
+                    extension: 'gif|jpg|png',
+                    messages: {
+                        required: "크린매니저 사진을 선택해 주세요!",
+                        extension: '이미지는 {0}확장자만 선택해 주세요!'
+                    }
+                });
+            } else {
+                $('#imgfile').rules("add", {
+//                    required: true,
+                    extension: 'gif|jpg|png',
+                    messages: {
+                        required: "크린매니저 사진을 선택해 주세요!",
+                        extension: '이미지는 {0}확장자만 선택해 주세요!'
+                    }
+                });
+            }
+
+        });
+        /*$('#tbContent\\.ctDeliveDate, #tbContent\\.ctOpenDate').datepicker({
+            format: "yyyy-mm-dd",
+            startDate: "-0d",
+            language: "ko",
+            autoclose: true,
+            todayHighlight: true
+        });*/
+        /*]]>*/
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content" style="width:600px;height:700px">
+
+    <form th:object="${employee}" th:action="@{/manage/employee/saveEmployee}" method="post" enctype="multipart/form-data" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{epCd}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+        <input type="hidden" th:field="*{epPass}" th:if="${employee.mode != 'new'}"/>
+        <input type="hidden" th:field="*{epImg}" th:if="${employee.mode != 'new'}"/>
+
+        <h2 class="page_title pop">크린매니저정보</h2>
+        <div class="pop_input_area codi">
+            <div class="col long harf">
+                <label>사진</label>
+                <img src="/img/example/codi2.png" alt="" th:if="${employee.mode == 'new'}" />
+                <img src="/img/example/codi2.png"
+                     th:attr="src=*{epImg},title=*{epNm},alt=*{epNm}" th:if="${employee.mode != 'new'}" />
+                <!--<a class="photo_pic">사진선택</a>-->
+                <!--<input type="file" id="imgfile" name="imgfile" style="width: 100px;" />-->
+                <span id="spnImgNm"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="썸네일 이미지" class="file_input_hidden" id="imgfile" name="imgfile" onchange="javascript:$('#spnImgNm').text(this.value);" />
+                </div>
+            </div>
+
+            <div class="col harf">
+                <label>입사일자</label>
+                <!--<input type="text" class="popup_input cal"/>
+                <img src="/img/calendar.png" alt=""  class="calendar"/>-->
+                <div class="input-group date">
+                    <input type="text" maxlength="10" class="popup_input" th:field="*{epJoinDt}" />
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            </div>
+
+            <div class="col harf">
+                <label>아이디</label>
+                <input type="text" class="popup_input" maxlength="50" th:field="*{epEmail}" th:readonly="${employee.mode != 'new'}" />
+            </div>
+
+            <div class="col harf" th:if="${employee.mode == 'new'}">
+                <label>암호</label>
+                <input type="text" class="popup_input" maxlength="20" th:field="*{epPass}" />
+            </div>
+
+            <div class="col harf" th:if="${employee.mode != 'new'}">
+                <label>암호변경</label>
+                <input type="password" maxlength="20" class="popup_input" th:field="*{newPass}" />
+            </div>
+
+            <div class="col harf">
+                <label>성명</label>
+                <input type="text" maxlength="20" class="popup_input" th:field="*{epNm}" />
+            </div>
+
+            <div class="col harf">
+                <label>연락처</label>
+                <input type="text" class="popup_input" maxlength="50" th:field="*{epTel}" />
+            </div>
+
+            <div class="col">
+                <label>성별</label>
+                <select th:field="*{epSex}">
+                    <option value="M">남</option>
+                    <option value="F">여</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label>지점</label>
+                <select th:field="*{bnCd}">
+                    <option th:each="cd : ${branch_cds}"
+                            th:value="${cd[0]}"
+                            th:text="${cd[1]}">text</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label>담당지역</label>
+                <!--<select th:field="*{epLoc}">
+                    <option th:each="cd : ${cmb_location}"
+                            th:value="${cd[0]} +''+ ${cd[1]} +''+ ${cd[2]}"
+                            th:text="${cd[3]}">text</option>
+                </select>-->
+                <select class="product_select" th:field="*{epLoc}"></select>
+            </div>
+
+            <div class="col">
+                <label>담당업무</label>
+                <select th:field="*{epPart}">
+                    <option th:each="cd : ${cmb_epPart}"
+                            th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                            th:text="${cd.cdNm}">text</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label>운전능력</label>
+                <select th:field="*{epDriveYn}">
+                    <option th:each="cd : ${cmb_epDrive}"
+                            th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                            th:text="${cd.cdNm}">text</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label>크린매니저등급</label>
+                <select th:field="*{epLevel}">
+                    <option th:each="cd : ${cmb_epLevel}"
+                            th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                            th:text="${cd.cdNm}">text</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <label class="long">자기소개</label>
+                <textarea class="popup_input" th:field="*{epIntro}"></textarea>
+            </div>
+        </div>
+        <div class="btn_group">
+            <a class="close_btn" id="btnSave">저장</a>
+            <a class="close_btn" id="btnDelete" th:if="${employee.mode != 'new'}">삭제</a>
+            <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

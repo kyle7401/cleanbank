@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="ko">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE : $DECORATOR_TITLE">cleanbank</title>
+    <!-- <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">100min</title> -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.1.4/jquery.min.js"
+            th:src="@{/webjars/jquery/1.11.3/jquery.min.js}"></script>
+
+    <link href="../static/css/all.css"
+          th:href="@{/css/all.css}" rel="stylesheet" media="screen"/>
+
+    <!--대쉬보드, 메인페이지를 제외한 모든 페이지에서 필요-->
+    <link href="../static/css/sub.css"
+          th:href="@{/css/sub.css}" rel="stylesheet" media="screen"/>
+
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/cleanbank.js"></script>
+
+    <link href="/css/frmValidate.css" rel="stylesheet" type="text/css" />
+
+    <!--<script layout:fragment="custom-script">
+        console.log('script for page1');
+    </script>-->
+</head>
+<body>
+
+<div layout:fragment="content">
+</div>
+
+</body>
+</html>

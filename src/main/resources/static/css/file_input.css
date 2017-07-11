@@ -1,0 +1,9 @@
+﻿.file_input_div {position: relative; width: 150px;  height: 42px;/*벨리데이션 용으로  overflow: hidden;*/ float: left; cursor: pointer;margin-left: 10px;} 
+.file_input_button {width: 150px; position: absolute; top: 0px; display: inline-block;font-size: 12pt;  font-weight: 800; color: #12b9ee; border-radius: 5px; background-color: #fff; cursor: pointer; float: left;  padding: 8px 33px;  cursor: pointer; border: 2px solid #12b9ee}
+.file_input_hidden {font-size:45px; position:absolute; right:0px; top:0px; opacity:0; filter:alpha(opacity=0); -ms-filter:"alpha(opacity=0)"; -khtml-opacity:0; -moz-opacity:0;} 
+.file_input_div input[type=file]{height: 42px;cursor: pointer;width: 155px !important;/*border: 1px solid #00B4FF; background-color: #00b4ff; *//* color: #fff; */padding: 8px 5px;border-radius: 5px; background-color:#fff}
+
+.order_photo_area .file_input_div { width: 88px; margin-left: 0;height: 33px;}
+.order_photo_area .file_input_button {  width: 88px; font-size: 10pt;padding: 10px 0;}
+.order_photo_area .file_input_div input[type=file] {width: 88px !important; padding: 0; height: 33px;}
+.order_photo_area>span {display: block;font-size: 10pt; width: 88px; text-overflow: ellipsis;overflow: hidden;white-space: nowrap; padding-bottom: 5px;height: 18px;}

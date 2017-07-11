@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cleanbank.iml" filepath="$PROJECT_DIR$/.idea/modules/cleanbank.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cleanbank_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cleanbank_main.iml" group="cleanbank" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cleanbank_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cleanbank_test.iml" group="cleanbank" />
+    </modules>
+  </component>
+</project>

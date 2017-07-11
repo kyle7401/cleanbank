@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>상품 관리</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="/css/file_input.css" rel="stylesheet" media="screen" />
+
+    <style>
+        .pop_input_area .col {position: relative;}
+        div.error { position: absolute; top: 15px; background-color: transparent; left: 40px;width: 290px;}
+
+        .pop_input_area .col.photo div {float: left; width: 90px; margin-top: 5px; margin-left: 0;}
+        .pop_input_area .col.photo label.long {padding: 85px 15px 87px 0;}
+        .pop_input_area .col.photo div img { width: 120px;height: 120px;}
+        .pop_input_area .col.photo div { width: 120px;}
+        .file_input_button {width: 120px; padding: 10px 0;}
+        .pop_input_area .col.photo div #spnImgNm {width: 120px; display: block; text-overflow: ellipsis;overflow: hidden;  white-space: nowrap; height: 14px;}
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            init();
+//            test();
+        });
+
+        function test() {
+            $('#cdGp').val('01');
+            $('#cdIt').val('01');
+            $('#cdNm').val('테스트코드 #1');
+            $('#cdSort').val('1');
+        }
+
+        function init() {
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });
+
+            $('#btnDelete').click(function () {
+//                alert( 'id '+ $('#id').val() +' 삭제!' );
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.fancybox.showLoading();
+
+                var vNo = $('#id').val();
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/jservice/delete-jservice',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        //pageReload();
+                        $.fancybox.hideLoading();
+//                        $.fancybox.close();
+                        parent.jQuery.fancybox.close();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                        $.fancybox.hideLoading();
+                    }
+                });
+
+            });
+        }
+
+        $(function(){
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                rules: {
+                    'jsNm' : {
+                        required : true
+                    },
+                    'jsCnt' : {
+                        required : true,
+                        number : true
+                    },
+                    'jsMemo' : {
+                        required : true,
+                        maxlength : 1000
+                    }
+                },
+
+                messages : {
+                    'jsNm' : {
+                        required : "상품명을 입력해 주세요."
+                    },
+                    'jsCnt' : {
+                        required : "수량을 입력해 주세요.",
+                        number : "수량은 숫자만 입력해 주세요."
+                    },
+                    'jsMemo' : {
+                        required : "설명을 입력해 주세요.",
+                        maxlength : "설명은 최대 {0}글자 이하 입력해 주세요."
+                    }
+                },
+
+                /*groups: {
+                    'jservice': 'cdGp cdIt'
+                },*/
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        /*if (element.attr('name') == 'mgDt') {
+                            error.insertAfter('.input-group.date');
+                        } else {*/
+                            error.insertAfter(element);
+//                        }
+                    }
+            });
+        });
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content">
+
+    <form th:object="${jservice}" th:action="@{/manage/jservice/saveJservice}" method="post" id="regfrm" name="regfrm" enctype="multipart/form-data">
+
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+        <input type="hidden" th:field="*{jsImg}"/>
+
+    <h2 class="page_title pop">상품 관리</h2>
+    <div class="pop_input_area codi">
+        <div class="col">
+            <label>상품명</label>
+            <input type="text" maxlength="20" class="popup_input" th:field="*{jsNm}" />
+        </div>
+
+        <div class="col">
+            <label>수량</label>
+            <input type="text" maxlength="5" class="popup_input" th:field="*{jsCnt}" />
+        </div>
+
+        <div class="col product">
+            <label class="long">설명</label>
+            <textarea class="popup_input" th:field="*{jsMemo}"></textarea>
+        </div>
+
+        <div class="col photo">
+            <label class="long">사진 이미지</label>
+            <div>
+                <!--<img src="/img/example/order_photo2.png" alt="" />
+                <a class="photo_pic">사진 선택</a>-->
+
+                <img src="/img/example/product_photo.png" alt="" th:if="${jservice.mode == 'new'}" />
+                <img src="/img/example/product_photo.png"
+                     th:attr="src=*{jsImg},title=*{jsNm},alt=*{jsNm}" th:if="${jservice.mode != 'new'}" />
+
+                <span id="spnImgNm"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="썸네일 이미지" class="file_input_hidden" id="imgfile" name="imgfile" onchange="javascript:$('#spnImgNm').text(this.value);" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="btn_group">
+        <a class="close_btn" id="btnSave">저장</a>
+        <a class="close_btn" id="btnDelete" th:if="${jservice.mode != 'new'}">삭제</a>
+        <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+    </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

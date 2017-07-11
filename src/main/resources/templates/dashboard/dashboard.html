@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>대시보드</title>
+
+    <!--<link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>-->
+
+   <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>-->
+
+<!--    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>-->
+
+    <link href="/css/dashboard.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/css/jquery.mCustomScrollbar.css" />
+    <script src="/js/jquery.mCustomScrollbar.concat.min.js"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+        $(document).ready(function(){
+            init();
+        });
+
+        function init() {
+            $("#content-1").mCustomScrollbar({
+                axis:"y",
+                theme:"light-3",
+                advanced:{autoExpandHorizontalScroll:true}
+            });
+
+            $("#content-2").mCustomScrollbar({
+                axis:"y",
+                theme:"light-3",
+                advanced:{autoExpandHorizontalScroll:true}
+            });
+
+            $("#content-3").mCustomScrollbar({
+                axis:"y",
+                theme:"light-3",
+                advanced:{autoExpandHorizontalScroll:true}
+            });
+        }
+    /*]]>*/
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+        <div class="accrue_status">
+            <h2 class="page_title">누적현황</h2>
+            <div class="current">
+                <div>
+                    <p><th:block th:text="*{todayCnt}"></th:block>건/<th:block th:text="*{lStatus1}"></th:block>건<br /><th:block th:text="*{iPer1}"></th:block>%<span>전주 대비 금일 현황</span></p><span class="line"></span>
+                    <p><th:block th:text="*{todayCnt}"></th:block>건/<th:block th:text="*{lStatus2}"></th:block>건<br /><th:block th:text="*{iPer2}"></th:block>%<span>전월 대비 금일 현황</span></p><span class="line"></span>
+                    <p><th:block th:text="*{cnt3_1}"></th:block>건/<th:block th:text="*{cnt3_2}"></th:block>건<br /><th:block th:text="*{iPer3}"></th:block>%<span>전주 대비 금일 누적 현황</span></p><span class="line"></span>
+                    <p><th:block th:text="*{cnt4_2}"></th:block>건/<th:block th:text="*{cnt4_1}"></th:block>건<br /><th:block th:text="*{iPer4}"></th:block>%<span>전월 대비 금일 누적 현황</span></p>
+                </div>
+            </div>
+        </div>
+
+    <div class="current_status">
+        <h2 class="page_title">현재현황</h2>
+        <div class="current">
+            <div>
+                <p><th:block th:text="*{cnt_by_status[0]}"></th:block><b>건</b><span>주문접수</span></p><span class="line"></span>
+                <p><th:block th:text="*{cnt_by_status[1]}"></th:block><b>건</b><span>수거완료</span></p><span class="line"></span>
+                <p><th:block th:text="*{cnt_by_status[2]}"></th:block><b>건</b><span>검수완료</span></p><span class="line"></span>
+                <p><th:block th:text="*{cnt_by_status[3]}"></th:block><b>건</b><span>공장입고</span></p><span class="line"></span>
+                <p><th:block th:text="*{cnt_by_status[4]}"></th:block><b>건</b><span>빨래통입고</span></p>
+            </div>
+        </div>
+    </div>
+
+        <div class="dash_table front">
+            <h2 class="page_title">
+                수거예정현황
+                <a href="/order/receive/list">더보기</a>
+            </h2>
+
+            <div class="table_title">
+                <div class="neme">닉네임</div>
+                <div class="schedule">방문예정시간</div>
+                <div class="address">수거지 주소</div>
+                <div class="codi">담당매니저</div>
+            </div>
+            <div id="content-1" class="content horizontal-images mCustomScrollbar _mCS_1"><div id="mCSB_1" class="mCustomScrollBox mCS-light-3 mCSB_vertical mCSB_inside" tabindex="0" style="max-height: none;"><div id="mCSB_1_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
+                <!-- your content -->
+                <table>
+                    <tbody>
+                    <tr th:each="list : ${take_req_list}">
+                        <td class="neme" th:text="${list.MB_NIC_NM}">최하늘</td>
+                        <td class="schedule" th:text="${list.IT_VISIT_DT}">14시 21분</td>
+                        <td class="address" th:text="${list.IT_REQ_ADDR}">서대문구 연희동 170-130 301호</td>
+                        <td class="codi" th:text="${list.EP_CD}">임영숙</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div><div id="mCSB_1_scrollbar_vertical" class="mCSB_scrollTools mCSB_1_scrollbar mCS-light-3 mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 30px; display: block; height: 252px; max-height: 450px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 30px;"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div>
+        </div>
+        <div class="dash_table">
+            <h2 class="page_title">
+                배송예정현황
+                <a href="/order/stock/list">더보기</a>
+            </h2>
+            <div class="table_title">
+                <div class="neme">닉네임</div>
+                <div class="schedule">방문예정시간</div>
+                <div class="number">품목 수</div>
+                <div class="address">수거지 주소</div>
+                <div class="pay">결제유무</div>
+                <div class="codi">담당매니저</div>
+            </div>
+
+
+            <div id="content-2" class="content horizontal-images mCustomScrollbar _mCS_2"><div id="mCSB_2" class="mCustomScrollBox mCS-light-3 mCSB_vertical mCSB_inside" tabindex="0" style="max-height: none;"><div id="mCSB_2_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
+                <table>
+                    <tbody>
+                    <tr th:each="list : ${deli_req_list}">
+                        <td class="neme" th:text="${list.MB_NIC_NM}">최하늘</td>
+                        <td class="schedule" th:text="${list.IT_VISIT_DT}">14시 21분</td>
+                        <td class="number" th:text="${list.OR_CNT}">4</td>
+                        <td class="address" th:text="${list.IT_REQ_ADDR}">서대문구 연희동 170-130 301호</td>
+                        <td class="pay" th:text="${list.OR_CHARGE_TYPE}">유</td>
+                        <td class="codi" th:text="${list.EP_CD}">임영숙</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div><div id="mCSB_2_scrollbar_vertical" class="mCSB_scrollTools mCSB_2_scrollbar mCS-light-3 mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_2_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 30px; display: block; height: 252px; max-height: 450px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 30px;"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div>
+        </div>
+
+        <div class="pm">
+            <h2 class="page_title">
+                프로모션 현황
+                <a href="/manage/promotion/list">더보기</a>
+            </h2>
+            <div class="total">총 건수 <span><th:block th:text="*{promotion_list.size()}"></th:block><b>건</b></span></div>
+            <div class="table_title">
+                <div class="pm_neme">프로모션명</div>
+                <div class="pm_start">프로모션 시작일</div>
+                <div class="pm_end">프로모션 종료일</div>
+                <div class="pm_overlap">중복사용가능여부</div>
+            </div>
+            <div id="content-3" class="content horizontal-images mCustomScrollbar _mCS_3"><div id="mCSB_3" class="mCustomScrollBox mCS-light-3 mCSB_vertical mCSB_inside" tabindex="0" style="max-height: none;"><div id="mCSB_3_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
+                <table>
+                    <tbody>
+                    <tr th:each="list : ${promotion_list}">
+                        <td class="pm_neme" th:text="${list.poNm}">2015년 연간 프로모션 </td>
+                        <td class="pm_start" th:if="${list.poStartDt} != null" th:text="*{#dates.format(list.poStartDt, 'yyyy-MM-dd')}">2015-05-12</td>
+                        <td class="pm_end" th:if="${list.poFinishDt} != null" th:text="*{#dates.format(list.poFinishDt, 'yyyy-MM-dd')}">2015-09-12</td>
+                        <td class="pm_overlap" th:text="(${list.poDubYn} != null and ${list.poDubYn} == 'Y') ? '가능' : ''">가능</td>
+                        <!--<td class="pm_overlap" th:if="${list.poDubYn} != null and ${list.poDubYn} == 'Y'" th:text="가능">가능</td>-->
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div><div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-light-3 mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 30px; display: block; height: 105px; max-height: 200px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 30px;"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div>
+
+        </div>
+</div>
+
+</body>
+</html>

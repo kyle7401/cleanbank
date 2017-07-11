@@ -1,0 +1,281 @@
+﻿/*서브 기본틀*/
+.page_title a.yell_btn { min-width: 80px;background-color: #fff; padding: 7px 10px 8px;  margin-top: -8px; border-radius: 5px;text-align: center;margin-left: 9px;  font-size: 10pt; border: 2px solid #12b9ee; color: #12b9ee;}
+.search_area,.table_area { width: 100%;float: left; margin-top: 10px; }
+.table_area{background-color: #fff;}
+.jsgrid.table_area {
+    background-color: transparent;
+}
+.table_area.product {margin-top: 0;}
+.table_area .jsgrid-grid-body {overflow-y: auto;}
+.table_area .jsgrid-header-scrollbar { overflow-y: auto;}
+.table_area table{width: 100%}
+.table_area table tr td,.table_area table tr th{font-size: 10.5pt; text-align: center; padding: 14px 0; /* width:33%; */vertical-align: middle; border: none;background-color: #fff;word-break: break-all;}
+.table_area table thead tr td, .table_area table tbody tr th{ background-color:#fff; color:#12b9ee; border-bottom: 2px solid #12b9ee; min-width: 30px; }
+.table_area table tbody tr td>img {
+    width: 63px;
+    height: 63px;
+}
+.table_area table tbody tr td{ border-bottom: 1px solid #ddd; }
+.table_area table tbody tr:hover td{ background-color:#f4f4f4; cursor: pointer;}
+.table_area table tbody tr.choice td {background-color: #fbf3d8;}
+.table_area table tbody tr.red td {background-color: #FFE2E2;}
+
+/*검색영역*/
+.search_input {  width: 100%; padding: 15px 25px; background-color: #fff; border: 1px solid #e7e7e7;}
+.search_input select { padding: 6px;  background-color: #ffffff;  border: none;  width: 100px;  border-bottom: 1px solid #e7e7e7; margin-left: 25px;}
+.search_input select.front{margin-left: 0;}
+.search_input label {padding-right: 10px; padding-left: 25px;}
+.search_input label.front{padding-left: 0;}
+.search_input input.default {padding: 7px; background-color: #ffffff;  border: none;  border-bottom: 1px solid #e7e7e7;  width: 205px;}
+.search_input input.default.shot {width: 175px;}
+.search_input input.default.shot2 {width: 135px;}
+.search_input input.term { padding: 7px; background-color: #ffffff;  border: none;  border-bottom: 1px solid #e7e7e7;width: 130px;}
+.search_input a.week_b { padding: 9px; background-color: #12b9ee; color: #fff; border-radius: 5px; width: 35px;display: inline-block; text-align: center; cursor: pointer;}
+.search_input a.month_b {padding: 9px; background-color: #12b9ee;color: #fff; border-radius: 5px; width: 35px; display: inline-block; text-align: center;cursor: pointer;}
+.search_input input[type=checkbox] {margin-left: 20px;/*체크박스 크기 키우기*/ height: 20px;width: 20px;vertical-align: middle; margin-top: -4px;}  
+/*페이지 네비*/    
+.pagination-lg > li > a, .pagination-lg > li > span { padding: 10px 19px;}
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: #31A4EB;border-color: #31A4EB;}
+.page_navi {float: left; width: 100%;background-color: transparent;margin-top: 30px; margin-bottom: 30px;}
+.page_navi nav { background-color: transparent; box-shadow: none;}
+.page_navi nav .pagination { margin: 0 auto; display: table;}
+
+
+/*리스트 테이블용 추가 css*/
+.jsgrid-pager-container {float: left; width: 100%;background-color: transparent;margin-top: 30px; margin-bottom: 30px;}
+.jsgrid.table_area { background-color: transparent;}
+.jsgrid-pager { margin: 0 auto;display: table;}
+.jsgrid-pager span.jsgrid-pager-page {  font-size: 18px; line-height: 1.3333333; position: relative; float: left; margin-left: -1px;color: #12b9ee; text-decoration: none; background-color: #fff; border: 1px solid #ddd;padding: 0;}
+.jsgrid-pager span.jsgrid-pager-page a { padding: 10px 19px; display: block;}
+.jsgrid-pager span.jsgrid-pager-page.jsgrid-pager-current-page {background-color: #12b9ee;border-color: #12b9ee;color: #fff;padding: 10px 19px;}
+.jsgrid-pager span.jsgrid-pager-nav-button { padding: 0;  font-size: 18px;line-height: 1.3333333; position: relative; float: left;margin-left: -1px;color: #12b9ee;text-decoration: none; background-color: #fff; border: 1px solid #ddd; text-indent: -10000px; width: 50px;background-image: url('/img/page_arrow_l.png');background-repeat: no-repeat;background-position: center;border-radius: 5px 0 0 5px;}
+.jsgrid-pager .jsgrid-pager-nav-inactive-button {  display: block;}
+.jsgrid-pager span:last-child {background-image: url('/img/page_arrow_r.png');border-radius: 0 5px 5px 0;}
+.jsgrid-pager span.jsgrid-pager-nav-button a { padding: 10px 19px;display: block;}
+.jsgrid-pager span.jsgrid-pager-page a:hover {background-color: #eee;}
+.table_area table tr td.jsgrid-align-left {text-align: left;}
+.table_area table tr td.jsgrid-align-right{ text-align: right;}
+
+/*팝업창으로 띄우는 상세용 css*/
+.page_title.pop{ padding-left: 15px;}
+.pop_input_area{ font-size: 10.5pt; border-top: 2px solid #12b9ee; }
+.pop_input_area .col label { width: 115px; text-align: right; padding: 15px 12px 15px 0; background-color: #fff;  font-weight: normal; border-right: 1px solid #e7e7e7 ;border-left: 1px solid #e7e7e7;}
+.pop_input_area .col { border-bottom: 1px solid #e6e6e6;float: left;width: 100%; background-color: #fff}
+.pop_input_area input.popup_input { padding: 7px; background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5;width: 320px;}
+.pop_input_area select {    padding: 7px; background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5; width: 320px;}
+.btn_group { width: 100%; text-align: center;float: left;}
+.btn_group a.close_btn {    margin-bottom: 20px; min-width: 80px; background-color: #fff; padding: 10px; border-radius: 5px; text-align: center; margin-left: 9px;  color: #12b9ee; font-size: 10pt; display: inline-block; margin-top: 20px; cursor: pointer; border: 2px solid #12b9ee}
+
+/*고객관리-고객현황*/
+.client_status { width: 100%; float: left;margin-top: 15px;}
+.client_status .current {background-color: #fff; float: left;  border:1px solid #e7e7e7;width: 100%; }
+.client_status .current div{text-align: center; }
+.client_status .current div p{font-size: 22pt; color:#12b9ee;width: 15%; float: left;padding: 25px 0;  }
+.client_status .current div>span.line{ display: block; width: 1px; background-color: #e7e7e7; height: 30px; margin-top: 40px;float: left;}
+.client_status .current div p:first-child{width: 24%;}
+.client_status .current div p span{font-size: 12pt;color: #444; display: block; padding-top: 20px}
+.client_status .current div p b {font-weight: normal;font-size: 13pt;}
+.client_status .current div p.class_p { width: 45%;}
+.client_status .current div p.class_p .class { width: 33.3%; float: left; padding-top: 0;font-size: 22pt; color: #12b9ee;}
+
+.address_book { float: left;width: 100%;position: relative;}
+.address_book h3 { background-color: #fff; padding: 14px 0 14px 20px; font-size: 10.5pt; border-bottom: 2px solid #12b9ee}
+.address_book ul li { border-bottom: 1px solid #ddd; padding: 12px 0 12px 20px; font-size: 10.5pt;}
+textarea.popup_input { padding: 7px;background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5; width: 320px; margin: 5px 0; height: 70px;}
+.address_book>a {min-width: 80px;background-color: #fff; padding: 10px 12px; border-radius: 5px; text-align: center;  margin-left: 9px;color: #12b9ee;font-size: 10pt; float: right;display: inline-block;position: absolute;top: 3px; right: 15px; border: 2px solid #12b9ee}
+.address_book .table_area.jsgrid { margin-top: 0;}
+
+
+/*팝업창으로 띄우는 상세용 css 2*/
+.pop_input_area .col label.long {padding: 33px 15px 35px;float: left;margin-right: 5px;}
+.pop_input_area .col.harf { width: 50%;float: left;}
+.pop_input_area .col.faq label {padding: 180px 12px 210px 0;float: left;margin-right: 5px;}
+.pop_input_area .col.faq textarea.popup_input { height: 390px;}
+.pop_input_area.codi .popup_input { width: 450px;}
+.pop_input_area.codi .input-group.date input.popup_input { width: 420px;}
+.pop_input_area.codi .col.harf input.popup_input {width: 160px;}
+.pop_input_area.codi .col.harf select{ width: 160px;}
+.pop_input_area.codi .col select{width: 453px;}
+.pop_input_area .col.long.harf { height: 225px;}
+.pop_input_area.codi .col.harf input.popup_input.cal{ width: 120px;}
+.pop_input_area.codi .col.harf .input-group.date {width: 175px;}
+.pop_input_area.codi .col.harf .input-group.date input.popup_input{width: 125px;}
+
+
+.col.long.harf span {display: block; width: 150px; text-overflow: ellipsis;overflow: hidden;  white-space: nowrap;padding: 0 0 5px; margin-left: 10px; float: left;}
+.pop_input_area .col.long.harf label { padding: 105px 12px; clear: initial; float: left;  margin-right: 5px;}
+.pop_input_area.codi textarea.popup_input{width: 450px;}
+.pop_input_area .col.long img {margin: 10px 10px 5px;width: 150px;height: 150px;}
+.pop_input_area .col.photo label.long {padding: 60px 15px 63px 0;}
+.pop_input_area .col.photo div {float: left;width: 90px; margin-top: 5px;}
+.pop_input_area .col.photo div a.photo_pic { min-width: 88px; margin-left: 0; margin-top: 6px;}
+.pop_input_area .col.product textarea.popup_input { height: 165px;}
+.pop_input_area .col.product label.long {padding: 81px 15px 81px;}
+
+
+/*일반 상세페이지용 css*/
+.input_area .col.harf2 .popup_input { width: 155px;}
+.input_area .col label.order_note {padding: 38px 12px 38px 0;float: left;margin-right: 3px;}
+.input_area input.popup_input.cal {width: 420px;}
+.input_area textarea.textarea { padding: 6px;background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5;width: 1080px; margin: 4px 3px;height: 80px;}
+img.calendar {  margin: 6px 20px 0 0;float: right;}
+.input_area .col.harf2 select { width: 149px;}
+a.photo_pic { min-width: 150px;  background-color: #31A4EB; padding: 10px; border-radius: 5px; text-align: center; margin-left: 9px;color: #fff; font-size: 10pt; display: inline-block;}
+.pop_input_area input.shot_input { width: 152px; padding: 7px; background-color: #fafafa;  border-radius: 5px; border: 1px solid #e5e5e5;}
+.pop_input_area select.shot { width: 103px;}
+.pop_input_area .col label.pm_label {padding: 100px 12px 108px 0;letter-spacing: -1px;float: left;margin-right: 5px;}
+.pop_input_area input.popup_input.cal {width: 280px;}
+.pop_input_area.codi .col input.popup_input.cal {width: 420px;}
+.input_area{ font-size: 10.5pt;border-top: 1px solid #e7e7e7;  border-right: 1px solid #e7e7e7;width: 100%; background-color: #fff;float: left;}
+.input_area .col label { width: 145px; text-align: right; padding: 15px 12px 15px 0; border-right: 1px solid #e7e7e7;  border-left: 1px solid #e7e7e7;}
+.input_area .col { border-bottom: 1px solid #e6e6e6;float: left;width: 100%;}
+.input_area input.popup_input {     padding: 6px;  background-color: #fff;  border: none;  border-bottom: 1px solid #e5e5e5;  width: 460px;    border-radius: 0;}
+.input_area select {    padding: 6px; background-color: #fff;  border:none; border-bottom: 1px solid #e5e5e5; width: 460px;}
+.input_area select.address { width: 355px;}
+.input_area .col.harf{width:50%;vertical-align: middle;    position: relative;}
+.input_area .col.harf2 { width: 25%;}
+.input_area select.shot{ width: 160px;}
+.input_area .input_text{padding-right: 30px;padding-left: 10px;}
+.input_area input.popup_input.shot2 { width: 80px;}
+.input_area input.popup_input.id { width: 255px;}
+.input_area .col.harf>button { background-color: #fff;border: 2px solid #12b9ee; color: #12b9ee;padding: 9px 20px;margin-top: -8px; border-radius: 5px; text-align: center;margin-left: 4px; ; font-size: 10pt;}
+.input_area .input_text2 { padding-right: 10px;}
+.input_area .col .day {padding-right: 15px; padding-left: 80px;}
+.input_area .col .day.first{padding-right: 15px;padding-left: 20px;}
+.input_area .col .shot_input {width: 180px; padding: 6px; background-color: #fff;border:none; border-bottom: 1px solid #e5e5e5;}
+.input_area .col label.img_label {float: left; padding: 95px 12px 95px 0;}
+.input_area .col span.blank_area {padding: 10px 0 10px 3px; display: inline-block; max-width: 1100px;  max-height: 89px; overflow-y: auto;word-break: break-all;}
+.input_area .col.cupon label {float: left; margin-right: 4px;}
+.input_area .col.cupon .input-group.date {float: left;}
+.input_area .col.harf.shot_input.cupon>span {float: left;}
+
+
+.img_area {float: left; padding: 5px;width: 150px;}
+.img_area .photo_pic { margin-left: 0;  margin-top: 5px;}
+.chk_area {padding: 0; vertical-align: middle; background-color: #fff; width: 100%; float: left; border-bottom: 1px solid #e7e7e7;}
+.chk_area label:first-child{margin-left: 50px}
+.chk_area label {  padding-right: 30px;}
+.chk_area input[type=checkbox] { margin-right: 5px;}
+.table_area.harf { width: 49%; background-color: transparent}
+a.add_brn { background-color: #fff;  padding: 4px 6px 5px; border-radius: 5px;text-align: center; color: #12b9ee; font-size: 10pt; border: 2px solid #12b9ee}
+a.add_brn.textbtn { padding: 8px 10px; margin-right: 0; margin-left: 8px; min-width: 80px;margin-top: -8px;}
+
+.chk_area .chk_div { width: 25%;float: left; border-left: 1px solid #ddd; border-top: 1px solid #ddd;padding: 10px 2.5%;height: 53px;}
+.chk_area .chk_div input[type=text] { padding: 6px;background-color: #fff; border-radius: 0; border:none; border-bottom: 1px solid #e5e5e5; width: 100px;}
+.chk_div .message {display: block;}
+.chk_div .message div {position: relative; color: #ff0000;left: 0; top: -5px;}
+
+
+
+
+.table_area.harf table thead tr td { background-color: #e5e5e5; color: #555;}
+.input_area input.popup_input.cupon { width: 310px;}
+.input_area .col a.cupon_num {padding: 6px 25px; background-color: #fff; color: #12b9ee;  border-radius: 5px;  cursor: pointer; border: 2px solid #12b9ee}
+.table_area.harf.full { width: 100%;}
+
+a.toggle_control {display: block;  float: left; width: 1250px; height: 40px; background-color: #12b9ee; border-radius: 0 0 5px 5px;  background-image: url('/img/toggle_1.png'); background-repeat: no-repeat; background-position: center;}
+.toggle_all { overflow: hidden; float: left; height: 722px;}
+a.toggle_control.open { background-image: url('/img/toggle_2.png');}
+/*상세페이지의 벨리데이션*/
+.input_area .message div.error {left: 320px;color: #ff0000;}
+.add_data_area .col.harf .input-group.date .message {width: 312px; clear: both;}
+.add_data_area .col .message .error { margin-left: 128px; background-color: #fff;width: 495px;}
+.add_data_area .col.harf .input-group.date .message .error { width: 150px; margin-left: 145px;margin-right: 0;}
+.add_data_area .col.harf .message .error {width: 183px;padding-right: 21px;}
+
+/*품목리스트용 css*/
+.add_data {width: 50%; float: left; margin-top: 10px; margin-left: 1%;margin-bottom: 10px;}
+.add_data_area{ font-size: 10.5pt; background-color: #fff; border-top: 1px solid #e7e7e7; border-right: 1px solid #e7e7e7;    float: left;}
+.table_area.harf table tbody tr th {background-color: #fff; color: #555;}
+.table_area.harf .jsgrid.table_area { margin-top: 0;}
+.total {background-color: #fff; color: #12b9ee; padding: 13px 20px; font-size: 12pt; border: 1px solid #e7e7e7; overflow: hidden;}
+.center>.total {margin-top: 10px;float: left;width: 100%;padding: 10px 20px;margin-bottom: -9px;}
+.total .total_pay { float: right;font-size: 15pt; display: inline-block;}
+.add_data_area .col label {width: 130px; text-align: right; padding: 15px 12px 15px 0;     border-right: 1px solid #e7e7e7;  border-left: 1px solid #e7e7e7;}
+.add_data_area .col { border-bottom: 1px solid #e6e6e6;float: left;width: 100%;position:relative;     min-height: 45px;}
+.add_data_area input.popup_input { padding: 6px; background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5;width: 475px;}
+.add_data_area .harf input.popup_input {width: 163px;}
+.add_data_area select {    padding: 6px;background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5;width: 475px;}
+.add_data_area .harf select{width: 148px;}
+.add_data_area .col.harf{width:50%;}
+.add_data_area select.shot{ width: 160px;}
+.add_data_area .input_text{padding-right:50px;}
+.add_data_area textarea.popup_input{width: 475px;height: 155px;}
+.add_data_area .col label.long { padding: 76px 12px;float: left;  margin-right: 5px;}
+.add_data_area .shot2 { width: 80px;}
+.add_data_area .input_text2 { padding-right: 10px;}
+.add_data_area .col img {margin: 5px 0;}
+.add_data_area .col label.order_photo {padding: 40px 12px 45px 0; float: left;margin-right: 5px;}
+.add_data_area select.product_select {width: 155px;}
+.add_data_area .harf input.popup_input.cal { width: 125px;}
+.add_data_area .col img.calendar { margin: 7px 5px 0 0;}
+.order_photo_area {width: 88px;float: left;margin-right: 9px;margin-bottom: 5px;}
+.add_data_area .order_photo_area a { min-width: 88px;background-color: #31A4EB;padding: 10px;border-radius: 5px; text-align: center;  color: #fff;font-size: 10pt; display: inline-block;}
+.col.product_note label { padding: 35px 12px 35px 0;float: left;margin-right: 5px;}
+.col.product_note textarea { padding: 6px; background-color: #fff; border:none; border-bottom: 1px solid #e5e5e5;width: 475px;margin-top: 5px;height: 75px;}
+.add_data_area .col label.order_photo.edit { float: left;display: block;position: absolute;bottom: 0;top: 0;padding: 15px 12px 15px 0;}
+.add_data_area input.popup_input.cal { width: 435px;}
+img.calendar.pm {float: none;margin-right: 5px; margin-top: -3px; vertical-align: middle; margin-left: 5px;}
+.add_data_area input.popup_input.shot2 {
+    width: 80px;
+}
+.order_photo_area img { width: 88px;height: 88px;}
+
+/*달력용 css 추가*/
+.input-group.date {  float: right;width: 320px; padding: 5px 9px 5px 0;}
+.pop_input_area .input-group.date input.popup_input { width: 280px; }
+.input-group.date .input-group-addon {text-indent: -10000px;padding: 6px 20px;border: none; background-color: transparent; background-image: url('/img/calendar.png');background-repeat: no-repeat; background-position: center;}
+.input_area .input-group.date input.popup_input { width: 427px;box-shadow: none;}
+.add_data_area .input-group.date input.popup_input {width: 442px;border-radius: 0;box-shadow: none;}
+.col.time .top { background-color: #fff !important;}
+.add_data_area .col.harf  .input-group.date { width: 140px;}
+.add_data_area .col.harf .input-group.date input.popup_input {width: 129px;/* font-size: 9pt; */}
+		
+	/*시계 피커용 css 추가*/
+	.input_area .col.harf.time .input-group.bootstrap-timepicker.timepicker { width: 180px;float: left; margin-top: 5px;    margin-left: 4px;}
+	.input_area .col.harf.time .input-group.bootstrap-timepicker.timepicker .form-control {background-color: #fff;border:none; border-bottom: 1px solid #e5e5e5; box-shadow: none; border-radius: 0}
+    .input_area .col.harf.time .input-group.bootstrap-timepicker.timepicker .input-group-addon{background-color: #fff;border:none; border-bottom: 1px solid #e5e5e5;border-radius: 0}
+	.input_area .col.harf.time label { float: left;}
+	.bootstrap-timepicker-widget table td input{border: none;}
+	
+		
+	.col.harf.shot_input>span { float: right;padding-top: 14px;padding-right: 8px;}
+	.input_area .col.harf.shot_input .input-group.date { width: 229px;}
+	.input_area .col.harf.shot_input .input-group.date input.popup_input {  width: 180px;}
+	
+	
+	
+	
+	
+	/*이미지 고정*/
+	.col.pro_img .img_area>img {width: 150px; height: 150px;}
+	
+
+	/*파일첨부*/
+
+	.row .col-lg-7,.row .col-lg-5 {width: 100%;}
+	.files .btn span { display: none;}
+	table.table.table-striped {float: left;width: 450px;margin-left: 160px;    table-layout: fixed;margin-bottom: 5px;}
+	.col .row.fileupload-buttonbar {width: 480px; margin-left: 145px; margin-right: 0; margin-top: 5px;}
+	.col canvas { background-color: #ddd;}
+	.order_photo_area.first {margin-left: 135px;}
+	
+	.input_area .col.time .day {padding-right: 0;padding-left: 0;}
+	.input_area .col.time .pull-left {float: right!important;}
+	
+	/*프로모션 기간용*/
+	.fromto.cupon .input-group.bootstrap-timepicker.timepicker { width: 220px;float: left;margin-top: 5px;}
+	.fromto.cupon>span {padding-top: 14px;padding-right: 8px; float: left; padding-left: 8px;}
+	.fromto.cupon .form-control{box-shadow: none;background-color: #fff;border-radius: 0; border:none; border-bottom: 1px solid #e5e5e5;}
+    .fromto.cupon .input-group-addon{background-color: #fff;border:none; border-bottom: 1px solid #e5e5e5;border-radius: 0}
+	
+	/*체크박스 크기 키우기*/
+	.table_area table tr th:first-child,.table_area table tr td:first-child{padding: 10px 0;}
+	.table_area table tr th:first-child input[type=checkbox],.table_area table tr td:first-child input[type=checkbox],.add_data_area .col input[type=checkbox]{ width: 20px;height: 20px;}
+	.input_area .col.harf>input[type=checkbox] { width: 20px; height: 20px;margin: -4px 0 0;vertical-align: middle;}
+
+	/*사진보기 수정 (공장전용용)*/
+	.add_data_area .col.noedit .btn-danger,.add_data_area .col.noedit input[type=checkbox] {display: none;}
+	table.table tbody.files p.name {text-overflow: ellipsis; overflow: hidden;white-space: nowrap;}
+/*감싸는 검색영역에 shot 클래스 추가*/
+   .search_input.shot input.default {width: 150px;}

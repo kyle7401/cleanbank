@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>빨래통입고처리</title>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var selectedItems = [];
+
+        $(document).ready(function(){
+            init();
+        });
+
+        function chkTac(vTac) {
+            var vCount = 0;
+            var vTrs = $('div.jsgrid-grid-body > table.jsgrid-table > tbody > tr');
+            /*console.log(vTrs.length);
+             console.log(vTrs.type);*/
+
+            $.each(vTrs, function(idx, item) {
+//                    debugger;
+                var vTxt = $(item).find('td').eq(2).text();
+                var vChk = $(item).find('input:checkbox');
+
+                if (vTac == vTxt) {
+                    ++vCount;
+//                    console.log($(vChk).prop('checked'));
+                    $(vChk).prop("checked", true);
+//                    console.log(idx + ' , ' + vTxt +' : checked ');
+                }/* else {
+                 $(vChk).prop("checked", false);
+                 //                    console.log(idx + ' , ' + vTxt +' : unchecked ');
+                 }*/
+
+                $(vChk).trigger('change');
+            });
+
+            var beepOne = $("#beep-one")[0];
+
+            switch(vCount) {
+                case 0:
+//                    alert('찾지못함');
+                    $('#mp3_src').attr('src', '/img/nonexsistance.mp3');
+                    break;
+
+                case 1:
+//                    alert('정상');
+                    $('#mp3_src').attr('src', '/img/normal.mp3');
+                    break;
+
+                default:
+//                    alert('2개 이상');
+                    $('#mp3_src').attr('src', '/img/duplication.mp3');
+                    break;
+            }
+
+            beepOne.load();
+            beepOne.play();
+        }
+
+        function init() {
+//            http://eternicode.github.io/bootstrap-datepicker/?markup=input&format=&weekStart=&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=2&todayBtn=false&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&keyboardNavigation=on&forceParse=on#sandbox
+            makeDatepicker2('#dtFrom, #dtTo');
+
+//            바코드 스캐너 입력을 위해서 기존 택번호 지우기
+            $("#txtTac").click(function () {
+                $(this).val(null);
+            });
+
+//            엔터시 검색 : 바코드 스캐너로 택번호 입력시 검색결과중 해당 택번호 선택
+            $("#txtTac").keydown(function (key) {
+//console.log('key.keyCode = '+ key.keyCode);
+                if (key.keyCode == 13) {
+                    var vTac = $(this).val();
+                    chkTac(vTac);
+                }
+            });
+
+//            등록
+/*            $('#btnRegister').click(function () {
+                window.location.href = '/accept/order/new';
+            });*/
+
+//            수정
+
+//            검색
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+
+//            엑셀
+            $('#btnExcel').click(function () {
+                var vTac = $('#txtTac').val();
+                var vFrom = $('#dtFrom').val();
+                var vTo = $('#dtTo').val();
+                var vStatus = $('#cmbStatus').val();
+
+                var vHour48 = $(':checkbox[id="chkHour48"]:checked').val();
+//            alert(vHour48);
+
+                if(!vHour48) {
+                    vHour48 = null;
+                }
+
+                var vCondition = $('#cmbCondition').val();
+                var vKeyword = $('#txtKeyword').val();
+
+                window.location.href = '/delivery/excel?tac='+ vTac +'&from='+ vFrom +'&to='+ vTo +'&hour48='+ vHour48 +'&status='+ vStatus +'&keyword='+ vKeyword +'&condition='+ vCondition;
+            });
+
+//            $('#grid').jsGrid('refresh');
+        }
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+//                sorting: true,
+                width: '100%',
+
+//                height: '90%',
+                height: 'auto',
+
+//                paging: true,
+                paging: false,
+                pageSize: [[${@environment.getProperty('js-grid.pageSize')}]],
+//                pagerFormat: 'Pages: {first} {prev} {pages} {next} {last}    {pageIndex} of {pageCount}',
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function(args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+//                data: db.clients,
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    {
+                        headerTemplate: function () {
+                            return $("<input id='checkAll'>").attr("type", "checkbox")/*.text("Delete")*/
+                                    .on("click", function () {
+//                                        deleteSelectedItems();
+                                        var $cb = $(this);
+//                                        console.log($cb.attr("id") +' @ '+ $cb.is(":checked"));
+                                        $("input[type=checkbox]").prop("checked", $cb.is(":checked"));
+                                        $("input[type=checkbox]").trigger('change');
+//                                        $("#jsGrid").jsGrid("option", $cb.attr("id"), $cb.is(":checked"));
+                                    });
+                        },
+                        itemTemplate: function (_, item) {
+                            return $("<input>").attr("type", "checkbox")
+                                    .on("change", function (e) {
+                                        $(this).is(":checked") ? selectItem(item) : unselectItem(item);
+//                                        console.log('checkbox change!!!');
+//                                        e.preventDefault();
+                                        event.stopPropagation();
+                                    })
+                                    .on("click", function (e) {
+//                                        console.log('checkbox click!!!');
+//                                        e.preventDefault();
+                                        event.stopPropagation();
+                                    });
+                        },
+                        align: "center",
+                        width: 30
+                    },
+
+                    { name: 'IT_OUT_DT', title: '공장출고 일시', type: 'text', align: 'center'},
+                    { name: 'IT_TAC', title: '택번호', type: 'text', align: 'center'},
+                    { name: 'MB_NIC_NM', title: '닉네임', type: 'text', align: 'center'},
+                    { name: 'OR_CD2', title: '주문번호', type: 'text', align: 'center'},
+                    { name: 'PD_NM', title: '품목명', type: 'text', align: 'center'},
+
+//                    { name: 'IT_PRICE', title: '금액', type: 'text', align: 'center'},
+//                    { name: 'TOT_PRICE', title: '금액', type: 'number', align: 'center'},
+
+                    { name: "TOT_PRICE", title: '금액', type: "number", align: 'center', width: 60,
+                        itemTemplate: function(value) {
+                            return formatNumber(value); }
+                    },
+
+                    { name: 'IT_STATUS', title: '진행상태', type: 'text', align: 'center'},
+                    { name: 'IT_CLAIM', title: '반품 여부', type: 'text', align: 'center'},
+                    { name: 'IT_MEMO', title: '품목비고', type: 'text', align: 'center'},
+                    { name: 'IT_FACTORY_MEMO', title: '공장비고', type: 'text', align: 'center'}
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+                window.location.href = '/accept/order/view5/'+ client.OR_CD;
+            };
+
+            var selectItem = function(item) {
+//                push 전에 중복여부 확인 필요
+                if($.inArray( item, selectedItems ) != -1) {
+//                    console.log('중복됨 : '+ $.inArray( item, selectedItems ));
+                } else {
+//                    console.log('추가됨');
+                    selectedItems.push(item);
+                }
+
+            };
+
+            var unselectItem = function(item) {
+                selectedItems = $.grep(selectedItems, function(i) {
+                    return i !== item;
+                });
+            };
+
+            //            처리
+            $('#btnChangeSt').click(function () {
+                fnChangeSt('빨래통입고', '0108');
+            });
+
+            var fnChangeSt = function(vTitle, vState) {
+                if(!selectedItems.length) {
+                    alert(vTitle +' 처리할 데이터를 선택해 주세요!')
+                    return;
+                }
+
+                if(!confirm(selectedItems.length +'건의 데이터를 '+ vTitle +' 처리 하시겠습니까?')) {
+                    return;
+                }
+
+                ids = [];
+
+                $.each(selectedItems, function(_, item) {
+//                    console.log(''+ item.ID);
+                    ids.push(item.ID);
+                });
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/stock/changeSt',
+                    data : { items: ids, state: vState },
+                    traditional: true,
+                    success : function(data, status) {
+                        alert(vTitle +' 처리 하였습니다!');
+                        fnSearch();
+                    },
+                    error : function(data, status) {
+                        alert(vTitle +' 처리중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                    }
+                });
+
+            };
+
+        });
+
+        (function() {
+
+            var db = {
+                loadData: function(filter) {
+                    /*return $.ajax({
+                     type: 'GET',
+                     url: '/branch/list',
+                     data: filter,
+                     dataType: 'json'
+                     });*/
+
+                    var d = $.Deferred();
+
+//                    초기 검색조건 : 주문상태 콤보
+                    filter.status = $('#cmbStatus').val();
+
+                    $.ajax({
+                        url: '/delivery/delivery_list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+//                        d.resolve(response.content);
+                        d.resolve(response);
+                    });
+
+                    return d.promise();
+                }
+
+            };
+
+            window.db = db;
+        }());
+
+        function fnSearch() {
+            var vTac = $('#txtTac').val();
+            var vFrom = $('#dtFrom').val();
+            var vTo = $('#dtTo').val();
+            var vStatus = $('#cmbStatus').val();
+
+            var vHour48 = $(':checkbox[id="chkHour48"]:checked').val();
+
+            if(!vHour48) {
+                vHour48 = null;
+            }
+
+//            alert(vHour48);
+//            alert(vStatus);
+
+            var vCondition = $('#cmbCondition').val();
+            var vKeyword = $('#txtKeyword').val();
+
+            $('#jsGrid').jsGrid('search', { tac: vTac, from: vFrom, to: vTo, hour48: vHour48, status: vStatus, keyword: vKeyword, condition: vCondition });
+
+            selectedItems = [];
+            $('#checkAll').prop("checked", false);
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+    <div class="search_area">
+        <h2 class="page_title">
+            빨래통입고처리
+<!--            <a class="yell_btn" id="btnExcel">엑셀</a>
+            <a class="yell_btn" id="btnRegister">주문작성</a>-->
+            <a class="yell_btn" id="btnExcel">엑셀</a>
+            <a class="yell_btn" id="btnChangeSt" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">빨래통입고</a>
+            <a class="yell_btn" id="btnSearch">조회</a>
+        </h2>
+        <div class="search_input shot">
+            <label class="front">택번호</label>
+            <input type="text" class="default" id="txtTac" />
+
+            <label>입고일자</label>
+            <input type="text" class="term" id="dtFrom" /> - <input type="text" class="term" id="dtTo" />
+
+            <input type="checkbox" value="Y" id="chkHour48" />
+            <label class="front">48시간 여부</label>
+
+            <label>진행상태</label>
+            <select class="front" id="cmbStatus">
+                <option value="">전체</option>
+                <option th:each="cd : ${cmb_status}"
+                        th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                        th:text="${cd.cdNm}" th:selected="${cd.cdIt == '07'}">text</option>
+            </select>
+
+            <select id="cmbCondition">
+                <option value="MB_TEL">전화번호</option>
+                <option value="MB_NIC_NM">닉네임</option>
+                <option value="MB_ADDR1">주소</option>
+                <!--<option value="IT_TAC">택번호</option>-->
+            </select>
+            <input type="text" class="default" id="txtKeyword" />
+        </div>
+    </div>
+
+    <div id="jsGrid" class="table_area"></div>
+
+    <audio id="beep-one" preload="auto">
+        <source src="" type="audio/mpeg" id="mp3_src" />
+        Your browser does not support the audio element.
+    </audio>
+</div>
+
+</body>
+</html>

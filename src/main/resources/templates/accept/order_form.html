@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title> 주문정보</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <link href="/css/file_input.css" rel="stylesheet" type="text/css" />
+    <link href="/css/frmValidate.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="/js/jquery.form.min.js"></script>
+
+    <!--<link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>-->
+
+    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/moment.js"></script>
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/transition.js"
+            th:href="@{/webjars/bootstrap/3.3.5/js/transition.js}"></script>
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/collapse.js"
+            th:href="@{/webjars/bootstrap/3.3.5/js/collapse.js}"></script>
+
+    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.js"></script>
+
+    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/ko.js"></script>
+
+    <link href="/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.css"
+          th:href="@{/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.css}" rel="stylesheet" media="screen"/>
+
+    <!-- blueimp Gallery styles -->
+    <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css" />
+
+    <link rel="stylesheet" href="/jQuery-File-Upload/css/jquery.fileupload.css"/>
+    <link rel="stylesheet" href="/jQuery-File-Upload/css/jquery.fileupload-ui.css"/>
+
+    <!-- The template to display files available for upload -->
+    <script id="template-upload" type="text/x-tmpl" src="/jQuery-File-Upload/template-upload.tmpl"></script>
+    <!-- The template to display files available for download -->
+    <script id="template-download" type="text/x-tmpl" src="/jQuery-File-Upload/template-download.tmpl"></script>
+
+    <style>
+        .input_area .toggle_all .message div.error {width: 210px; position: absolute; top: 15px;left: 249px; z-index: 10;background-color: transparent;float: left;}
+        .input_area .toggle_all .message div.error#orReqDt-error { left: 100px;}
+
+        .blueimp-gallery>.indicator>li {
+            width: 23px !important;
+            height: 23px !important;
+        }
+    </style>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+                var selectedItems = [];
+                var validator2;
+
+        function getBnTacNo() {
+            $.ajax({
+                type : "GET",
+                cache : false,
+                url : '/branch/getBnBarCd',
+                data : { id: $('#bnCd').val() },
+                //                                    traditional: true,
+                success : function(data, status) {
+                    $('#bnBarCd').val(data);
+                    $( '#bnBarCd' ).trigger( 'keyup' );
+//                                            alert(data);
+                },
+                error : function(data, status) {
+                    console.log('실패 '+ data);
+                }
+            });
+        }
+
+            $(document).ready(function(){
+                init();
+    //            test();
+    //            alert('[[${order.bnCd}]]');
+
+                fnNew();
+            });
+
+            function orderToggle(){
+                $('.toggle_all').hide();
+                $('.input_area>a').bind('click', function(){
+                    $(this).toggleClass('open').prev().slideToggle();
+
+                });
+            }
+
+    //        품목 리스트의 가격 + 추가요금 수량을 계산하여 주문정보를 Update후 결과 리턴
+            function fnSaveAmountCnt() {
+                $.ajax({
+    //                type : "POST",
+    //                cache : false,
+                    dataType: "json",
+                    url : '/order/saveAmountCnt',
+                    data : { no: $('#regfrm #orCd').val() },
+    //                    traditional: true,
+                    success : function(data, status) {
+    /*                    console.log(data.orPrice);
+                        console.log(data.orCnt);*/
+                        $('#regfrm #orPrice').val(data.orPrice);
+                        $('#regfrm #orCnt').val(data.orCnt);
+    //                    alert(' 처리 하였습니다!\n'+ data);
+                    },
+                    error : function(data, status) {
+    //                    alert(' 처리중 에러가 발생하였습니다.');
+                    }
+                });
+            }
+
+            function init() {
+    //            날짜만
+    //            makeDatepicker2('.input-group.date');
+
+    /*            $('#datetimepicker1, #datetimepicker2').datetimepicker({
+                    locale: 'ko',
+                    format: 'YYYY-MM-DD HH:mm',
+                    sideBySide: true
+                });*/
+
+                /*$("#bnBarCd").change(function(){
+//                    alert('bnBarCd');
+                    $('#itTac').val($(this).val());
+                });*/
+
+                $("#bnBarCd").keypress(function (e) {
+                    //if the letter is not digit then display error and don't type anything
+                    /*if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                     //display error message
+                     $("#errmsg").html("숫자만 입력해 주세요").show().fadeOut("slow");
+                     return false;
+                     }*/
+
+                    if(!$.isNumeric(String.fromCharCode(e.which))) {
+                        $("#errmsg").html("숫자만 입력해 주세요").show().fadeOut("slow");
+                        return false;
+                    }
+                });
+
+                $("#bnBarCd").keyup(function (e) {
+                    console.log(this.value +' = '+ $.isNumeric(this.value));
+                    if($.isNumeric(this.value)) $('#itTac').val($(this).val());
+                });
+
+                getBnTacNo();
+
+                makeDateTimepicker('#datetimepicker1, #datetimepicker2, #divOrReqDt, #divOrVisitDt, #divOrDeliVisitDt, #divOrDeliFuVisitDt, #divOrClaimDt, #divOrAcceptDt, #divOrOrderDt');
+                makeDateTimepicker('#divItReqDt, #divItVisitDt, #divItInDt, #divItOutDt, #divItDeliVisitDt, #divItDeliFuVisitDt, #divItBaekInDt');
+
+//                주문을 생성할 시 현시간을 디폴트 값으로 설정 필요
+                if($('#regfrm > #mode').val() == 'new') {
+                    $('#divOrOrderDt').data("DateTimePicker").minDate(new Date());
+                }
+
+                $("#divOrReqDt").on("dp.change", function (e) {
+//                    debugger;
+//                    console.log('수거예정일시 : '+ e.date);
+//                    console.log('수거예정일시 : '+ e.getDate());
+
+                    var date2 = new Date(e.date);
+//                    console.log('수거예정일시2 : '+ date2);
+                    date2.setDate(date2.getDate() + 3);
+
+                    $('#divOrDeliFuVisitDt').data("DateTimePicker").minDate(date2);
+                });
+
+//                수거지 주소가 기본으로 배송지 주소 항목으로
+                $('#orReqAddr').change(function() {
+                    var vReqAddr = $(this).val();
+
+                    if(vReqAddr) {
+                        console.log('수거지 주소 : '+ vReqAddr);
+                        var vDeliAddr = $('#orDeliAddr').val();
+                        if(!vDeliAddr) {
+                            $('#orDeliAddr').val(vReqAddr);
+                        }
+                    }
+                });
+
+//                수거지 주소가 기본으로 배송지 주소 항목으로
+                $('#itReqAddr').change(function() {
+                    var vReqAddr = $(this).val();
+
+                    if(vReqAddr) {
+                        console.log('수거지 주소 : '+ vReqAddr);
+                        var vDeliAddr = $('#itDeliAddr').val();
+                        if(!vDeliAddr) {
+                            $('#itDeliAddr').val(vReqAddr);
+                        }
+                    }
+                });
+
+//                수거크린매니저가 기본으로 배송크린매니저 항목으로
+                $('#epCd').change(function() {
+                    var vEpCd = $(this).val();
+
+                    if(vEpCd) {
+                        console.log('수거크린매니저 : '+ vEpCd);
+                        var vDeliEpCd = $('#orDeliEpCd').val();
+                        if(!vDeliEpCd) {
+                            $('#orDeliEpCd').val(vEpCd);
+                        }
+                    }
+                });
+
+                $('#bnCd').change(function() {
+                    getBnTacNo();
+                });
+
+                    $('#btnModifyAddr').click(function () {
+
+                    var vMbrId = $('#mbCd').val();
+
+                    if(!vMbrId) {
+                        alert('수정할 회원정보를 선택해 주세요!');
+                        return false;
+                    }
+
+                    $.fancybox.open({
+                        href : '/accept/order/member/'+ vMbrId,
+                        type : 'iframe',
+                        //            modal : true,
+                        padding : 0,
+                        width : 590,
+                        height: 520,
+                        autoSize: false,
+                        fitToView: false,
+                        afterClose: function () { // 회원에 따른 주소 콤보 Ajax 구성
+                            fnMakeMbAddrCmb(vMbrId);
+                            fnMakeMbAddrCmb2(vMbrId);
+                        }
+                    });
+                });
+
+                $('#btnAddMbr').click(function () {
+                    $.fancybox.open({
+                        href : '/manage/member/new',
+                        type : 'iframe',
+    //            modal : true,
+                        padding : 0,
+                        width : 590,
+                        height: 720,
+                        autoSize: false,
+                        fitToView: false/*,
+                        afterClose: function () {
+                            fnSearch();
+                        }*/
+                    });
+                });
+
+                // 주소를 재검색 하면서 기존 선택한 주소가 초기화 된다
+                /*$('#btnModifyMbr').click(function () {
+
+                    var vMbrId = $('#mbCd').val();
+
+                    if(!vMbrId) {
+                        alert('수정할 회원정보를 선택해 주세요!');
+                        return false;
+                    }
+
+                    $.fancybox.open({
+                        href : '/manage/member/'+ vMbrId,
+                        type : 'iframe',
+                        //            modal : true,
+                        padding : 0,
+                        width : 590,
+                        height: 720,
+                        autoSize: false,
+                        fitToView: false,
+                         afterClose: function () { // 회원에 따른 주소 콤보 Ajax 구성
+                             fnMakeMbAddrCmb(vMbrId);
+                             fnMakeMbAddrCmb2(vMbrId);
+                         }
+                    });
+                });*/
+
+                //            회원에 따른 주소 콤보 Ajax 구성후 db에 저장된 주소로 Combo값을 설정해 준다
+    //            $('#orReqAddr').data('addr', [[${order.orReqAddr}]]);
+    //            $('#orReqAddr').data('addr', [[${order.orReqAddr}]]);
+
+    /*            var vMbrId = $('#mbCd').val();
+                if(vMbrId) {
+                    fnMakeMbAddrCmb(vMbrId);
+                }*/
+
+                /*왼쪽 그리드 클릭시 상세처리를 위하여 load 처리가 끝나면 콤보의 값을 설정하고 change 이벤트를 발생 시킨다
+                $("#pdLvl1").data('lvl', '01');
+                $("#pdLvl2").data('lvl', '01');
+                $("#pdLvl3").data('lvl', '02');*/
+
+                //            검수완료
+                $('#btnChangeSt1').click(function () {
+                    fnChangeSt('검수완료', '0104');
+                });
+
+                //            입고완료
+                $('#btnChangeSt2').click(function () {
+                    fnChangeSt('입고완료', '0105');
+                });
+
+                //            수거완료
+                $('#btnChangeSt3').click(function () {
+                    fnChangeSt('수거완료', '0103');
+                });
+
+                var fnChangeSt = function(vTitle, vState) {
+                    if(!confirm(vTitle +' 처리 하시겠습니까?')) {
+                        return;
+                    }
+
+                    $.ajax({
+                        type : "POST",
+                        cache : false,
+                        url : '/order/changeSt2',
+                        data : { no: $('#regfrm #orCd').val(), status: vState },
+    //                    traditional: true,
+                        success : function(data, status) {
+                            alert(vTitle +' 처리 하였습니다!');
+                            location.reload();
+    //                        fnSearch();
+                        },
+                        error : function(data, status) {
+                            alert(vTitle +' 처리중 에러가 발생하였습니다.');
+    //                        console.log('실패 '+ data);
+                        }
+                    });
+
+                };
+
+                $.each($('#item_img1, #item_img2, #item_img3, #item_img4, #item_img5'), function () {
+                    $(this).click(function () {
+                        var vUrl = $(this).data('url');
+
+                        if (vUrl) {
+    //                        alert('이미지 클릭시 : '+ vUrl);
+                            window.open(vUrl);
+                        }
+                    });
+                });
+
+    //            품목 상위 변경시 중위 콤보 처리
+                $('#pdLvl1').change(function() {
+                    var vPdLvl1 = $(this).val();
+                    $('#pdLvl2').load('/etc/ProductCombo2', {pdLvl1: vPdLvl1, pdLvl2: '00', pdLvl3: '00'}, function() {
+    //                    alert( "pdLvl2 Load was performed." );
+    //                    상세처리
+                        var thisLvl = $('#pdLvl2').data('lvl');
+
+                        if(thisLvl) {
+                            $('#pdLvl2').val(thisLvl);
+                            $( '#pdLvl2' ).trigger( 'change' );
+                        }
+                    });
+    //                alert($(this).data('lvl'));
+                    /*alert($(this).val());
+                    alert($(this).children("option:selected").text());*/
+                });
+
+    //            품목 중위 변경시 하위 콤보 처리
+                $("#pdLvl2").change(function(){
+                    var vPdLvl1 = $('#pdLvl1').val();
+                    var vPdLvl2 = $(this).val();
+
+    //                alert($(this).data('lvl'));
+    //                alert(vPdLvl1 +','+ vPdLvl2);
+                    $('#pdLvl3').load('/etc/ProductCombo3', {pdLvl1: vPdLvl1, pdLvl2: vPdLvl2, pdLvl3: '00'}, function() {
+    //                    alert( "pdLvl3 Load was performed." );
+    //                    상세처리
+                    var thisLvl = $('#pdLvl3').data('lvl');
+
+                    if(thisLvl) {
+                        $('#pdLvl3').val(thisLvl);
+    //                    $( '#pdLvl3' ).trigger( 'change' );
+                    } else { // 기본으로 일반 선택
+                        $("#pdLvl3 option:eq(1)").attr("selected", "selected");
+                        $( '#pdLvl3' ).trigger( 'change' );
+                    }
+                });
+                });
+
+    //            품목 하위 변경시 금액 입력
+                $("#pdLvl3").change(function(){
+                    var vPrice = $(this).children('option:selected').data('price');
+                    $('#itPrice').val(vPrice);
+    //                alert('금액 '+ vPrice);
+    //                alert($(this).data('lvl'));
+                });
+
+    //            회원검색 팝업
+                $('#btnFindMbr').click(function () {
+                    $.fancybox.open({
+                        href : '/popup/Member',
+                        type : 'iframe',
+    //                    modal : true,
+                        padding : 0,
+                        width : 700,
+                        height: 560,
+                        autoSize    : false,
+                        fitToView   : false/*,
+                        afterClose: function () {
+                            fnSearch();
+                        }*/
+                    });
+                });
+
+                //            닫기
+                $('#btnBack').click(function () {
+                    window.location.href = [[${back_url}]];
+                });
+
+    //            상단 저장
+                $('#btnSave').click(function () {
+                    $('#regfrm').submit();
+                });
+
+    //            하단 저장
+                $('#btnSave2').click(function () {
+                    if($('#regfrm > #mode').val() == 'new') {
+                        alert('주문정보를 먼저 저장해 주세요!');
+                        return false;
+                    }
+
+    //alert($('#fileupload').valid());
+    //                return $('#fileupload').valid();
+                    if(!$('#fileupload').valid()) return false;
+    //alert(1);
+                    if(!confirm("저장 하시겠습니까?")) return false;
+
+                        // 2월15일 java.lang.NumberFormatException: For input string: "" 에러가 발생한다
+                        /*$("#fileupload :input").each(function() {
+                                var input = $(this); // This is the jquery object of the input, do what you will
+
+                                if(input.attr('name') && input.attr('name') != 'files[]') {
+                                        console.log('name = '+ input.attr('name'));
+
+                                        if(!input.val()) {
+                                                /!*input.prop('val', 0);
+                                                input.prop('value', 0);*!/
+                                                input.val(0)
+
+                                                //                                    console.log('값이 없을때 = '+ input.attr('name') +' = '+ input.val());
+                                                } else {
+                                                //                                    console.log('값이 있을때 = '+ input.attr('name') +' = '+ input.val());
+                                                }
+                                        }
+
+                                /!*if(input.attr('name') && !input.val()) {
+                                    console.log(input.attr('name') +' = '+ input.val());
+                                }*!/
+                        });
+
+                        alert($('#fileupload').serialize());*/
+
+                        // 2월15일 java.lang.NumberFormatException: For input string: "" 에러가 발생하여 ajaxSubmit을 ajax로 변경
+                        $.ajax({
+                            type: "POST",
+                            url: '/order/saveOrderItems',
+                            cache: false,
+                            data: $('#fileupload').serialize(),
+                            success: function (data, status) {
+                                fnSearch2();
+//                                setImages(data.orCd, data.id);
+
+                                //        품목 리스트의 가격 + 추가요금 수량을 계산하여 주문정보를 Update후 결과 리턴
+                                fnSaveAmountCnt();
+                                $('#fileupload #itTac').val(data.itTac);
+                                $('#fileupload #id').val(data.id);
+                                alert("저장 하였습니다!");
+                                fnNew();
+                            },
+                            error: function (data, status) {
+                                    alert('저장중 에러가 발생하였습니다.');
+                            }
+                        });
+
+    //                http://mytory.net/archives/2292/
+                    /*$('#fileupload').ajaxSubmit({
+                        beforeSubmit: function (data, frm, opt) {
+                            alert("전송전!!\n"+ data +'\n'+ frm);
+    //                        return $('#fileupload').valid();
+
+                            return true;
+                        },
+                        success : function(data, status) {
+    //                        console.log('저장결과 = '+ data);
+                            fnSearch2();
+                            setImages(data.orCd, data.id);
+
+                            //        품목 리스트의 가격 + 추가요금 수량을 계산하여 주문정보를 Update후 결과 리턴
+                            fnSaveAmountCnt();
+
+                            alert("저장 하였습니다!");
+                        },
+                        error : function(data, status) {
+                            alert('저장중 에러가 발생하였습니다.');
+                        }
+                    });*/
+
+                });
+
+    //            품목 리스트 리스트 신규
+                $('#btnAdd').click(function () {
+
+                    if($('#regfrm > #mode').val() == 'new') {
+                        alert('주문정보를 먼저 저장해 주세요!');
+                        return false;
+                    }
+
+                    fnNew();
+                });
+
+                $('#btnDelete').click(function () {
+                    if(!confirm("삭제 하시겠습니까?")) return false;
+
+                    var vNo = $('#orCd').val();
+
+                    $.ajax({
+                        type : "POST",
+                        cache : false,
+                        url : '/order/delete-order',
+                        data : {no: vNo},
+                        //mimeType: 'multipart/form-data',
+                        success : function(data, status) {
+                            alert("삭제 하였습니다!");
+                            window.location.href = '/take/order/list';
+                        },
+                        error : function(data, status) {
+                            alert('삭제중 에러가 발생하였습니다.');
+                        }
+                    });
+
+
+                });
+
+                $('#btnDelete2').click(function () {
+                    var vNo = $('#fileupload #id').val();
+
+                    if(!vNo) {
+                        alert('삭제할 대상을 선택해 주세요!');
+                        return false;
+                    }
+
+                    if(!confirm("삭제 하시겠습니까?")) return false;
+
+                    $.ajax({
+                        type : "POST",
+                        cache : false,
+                        url : '/order/delete-items',
+                        data : {no: vNo},
+                        //mimeType: 'multipart/form-data',
+                        success : function(data, status) {
+                            fnSaveAmountCnt();
+                            alert("삭제 하였습니다!");
+                            fnSearch2();
+                        },
+                        error : function(data, status) {
+                            alert('삭제중 에러가 발생하였습니다.');
+                        }
+                    });
+
+                });
+
+    //            window.setTimeout('orderToggle()', 1000);
+                if($('#regfrm > #mode').val() != 'new') {
+                    orderToggle();
+                }
+            }
+
+            $(function(){
+
+    /*            pdLvls = [
+                    { Name: '품목1', Id: '0101' },
+                    { Name: '품목2', Id: '0102' }
+                ];*/
+
+                pdLvls = [];
+
+                $.ajax({
+                    url: '/product/list2?pdLvl1=00&pdLvl2=00&pdLvl3=00',
+                    dataType: 'json',
+                }).done(function (response) {
+                    $.each(response.content, function (idx, obj) {
+                        pdLvls.push({Id: obj['pdLvl1'] + obj['pdLvl2'], Name: obj['pdNm']});
+                    });
+
+    //                TODO : 시간이 없으니 일단 여기서 처리!
+                    $('#jsGrid').jsGrid({
+                        width: '100%',
+                        height: 'auto',
+                        paging: true,
+                        pageSize: 10,
+                        pagerFormat: '{prev} {pages} {next}',
+                        pagePrevText: 'Prev',
+                        pageNextText: 'Next',
+
+                        rowClick: function(args) {
+                            showDetailsDialog('Edit', args.item);
+                        },
+
+                        autoload: true,
+                        controller: db,
+
+                        fields: [
+
+    //                        http://js-grid.com/demos/batch-delete.html
+                            {
+                                headerTemplate: function () {
+                                    return $("<input id='checkAll'>").attr("type", "checkbox")/*.text("Delete")*/
+                                            .on("click", function () {
+    //                                        deleteSelectedItems();
+                                                var $cb = $(this);
+    //                                        console.log($cb.attr("id") +' @ '+ $cb.is(":checked"));
+                                                $("input[type=checkbox]").prop("checked", $cb.is(":checked"));
+                                                $("input[type=checkbox]").trigger('change');
+    //                                        $("#jsGrid").jsGrid("option", $cb.attr("id"), $cb.is(":checked"));
+                                            });
+                                },
+                                itemTemplate: function (_, item) {
+                                    return $("<input>").attr("type", "checkbox")
+                                            .on("change", function (e) {
+                                                $(this).is(":checked") ? selectItem(item) : unselectItem(item);
+    //                                        console.log('checkbox change!!!');
+    //                                        e.preventDefault();
+                                                event.stopPropagation();
+                                            })
+                                            .on("click", function (e) {
+                                                console.log('checkbox click!!!');
+    //                                        e.preventDefault();
+                                                event.stopPropagation();
+                                            });
+                                },
+                                align: "center",
+                                width: 30
+                            },
+
+                            { name: 'itTac', title: '택번호', type: 'number', align: 'center'},
+
+    //                    { name: 'pdLvl', title: '품목', type: 'text', align: 'center'},
+    //                    { name: "pdLvl", title: '품목', type: "select", items: db.pdLvls, valueField: "Id", textField: "Name" },
+                            { name: "pdLvl", title: '품목', type: "select", items: pdLvls, valueField: "Id", textField: "Name" },
+
+    //                        { name: 'itCnt', title: '수량', type: 'text', align: 'center'},
+
+                            //	가격(itPrice) + 추가요금(itAddChg)
+    //                        { name: 'itPrice', title: '가격', type: 'text', align: 'center', width: 80},
+    //                        { name: 'itTotPrice', title: '가격', type: 'number', align: 'center', width: 80},
+                            { name: 'itTotPrice', title: '가격', type: 'number', align: 'center', width: 80,
+                                itemTemplate: function(value) {
+                                    return formatNumber(value); }
+                            },
+
+    //                        { name: 'itVisitDt', title: '수거일자', type: 'text', align: 'center'},
+                            { name: 'itMemo', title: '품목비고', type: 'text', align: 'center'},
+                            { name: 'itDeliVisitDt', title: '배송일시', type: 'text', align: 'center'},
+    //                        { name: 'itStatus', title: '진행상태', type: 'text', align: 'center'}
+                            { name: 'itStatus', title: '진행상태', type: "select", items: db.status, valueField: "Id", textField: "Name" },
+                        ]
+                    });
+
+                });
+
+    /*            $('#jsGrid').jsGrid({
+                    width: '100%',
+                    height: 'auto',
+                    paging: true,
+                    pageSize: 5,
+                    pagerFormat: '{prev} {pages} {next}',
+                    pagePrevText: 'Prev',
+                    pageNextText: 'Next',
+
+                    rowClick: function(args) {
+                        showDetailsDialog('Edit', args.item);
+                    },
+
+                    autoload: true,
+                    controller: db,
+
+                    fields: [
+                        { name: 'itTac', title: '택번호', type: 'number', align: 'center'},
+
+    //                    { name: 'pdLvl', title: '품목', type: 'text', align: 'center'},
+    //                    { name: "pdLvl", title: '품목', type: "select", items: db.pdLvls, valueField: "Id", textField: "Name" },
+                        { name: "pdLvl", title: '품목', type: "select", items: pdLvls, valueField: "Id", textField: "Name" },
+
+                        { name: 'itCnt', title: '수량', type: 'text', align: 'center'},
+                        { name: 'itPrice', title: '가격', type: 'text', align: 'center'},
+                        { name: 'itVisitDt', title: '수거일자', type: 'text', align: 'center'},
+                        { name: 'itDeliVisitDt', title: '배송일자', type: 'text', align: 'center'},
+                        { name: 'itStatus', title: '진행상태', type: 'text', align: 'center'}
+                    ]
+                });*/
+
+                var showDetailsDialog = function(dialogType, client) {
+                    validator2.resetForm();
+                    $("#bnBarCd").attr("readonly", true);
+
+                    $('#fileupload #id').val(client.id);
+
+//alert(client.orCd);
+                    $('#fileupload #orCd').val(client.orCd);
+//alert( $('#fileupload #orCd').val());
+
+                    $('#fileupload #mode').val('edit');
+                    $('#fileupload #regiDt').val(client.regiDt);
+                    $('#fileupload #user').val(client.user);
+
+    //                품목 콤보 Ajax 처리를 위하여 data 설정및 trigger 처리
+                    $('#fileupload #pdLvl1').val(client.pdLvl1);
+                    $('#fileupload #pdLvl2').data('lvl', client.pdLvl2);
+                    $('#fileupload #pdLvl3').data('lvl', client.pdLvl3);
+
+                    $( '#pdLvl1' ).trigger( 'change' );
+
+                    $('#fileupload #itTac').val(client.itTac);
+                    $('#fileupload #itPrice').val(client.itPrice);
+                    $('#fileupload #itCnt').val(client.itCnt);
+                    $('#fileupload #itBrand').val(client.itBrand);
+
+                    $('#fileupload #itColor').val(client.itColor);
+                    $('#fileupload #itPatten').val(client.itPatten);
+                    $('#fileupload #itStatus').val(client.itStatus);
+                    $('#fileupload #itClMemo').val(client.itClMemo);
+    //                $('#fileupload #itReqAddr').val(client.itReqAddr);
+    //                $('#fileupload #itReqAddr').val(client.itReqAddr);
+                    $('#fileupload #itReqDt').val(client.itReqDt);
+                    $('#fileupload #itVisitDt').val(client.itVisitDt);
+                    $('#fileupload #itInDt').val(client.itInDt);
+                    $('#fileupload #itOutDt').val(client.itOutDt);
+                    $('#fileupload #itDeliFuVisitDt').val(client.itDeliFuVisitDt);
+                    $('#fileupload #itDeliVisitDt').val(client.itDeliVisitDt);
+
+    //                $('#fileupload #itClaim').val(client.itClaim);
+    //                alert($('input:checkbox[name="itClaim"]').length +' @ '+ client.itClaim +' @ '+ $('input:checkbox[name="itClaim"]').attr('checked'));
+                    if(client.itClaim && client.itClaim == 'Y') {
+    //                    alert( client.itClaim +' @ '+ $('input:checkbox[name="itClaim"]').attr('checked') );
+    //                    $('input:checkbox[name="itClaim"]').val(client.itClaim);
+    //                    $('input:checkbox[name="itClaim"]').attr('checked', true);
+                        $('input:checkbox[name="itClaim"]').prop('checked', true);
+                    } else {
+    //                    $('input:checkbox[name="itClaim"]').val(null);
+    //                    $('input:checkbox[name="itClaim"]').attr('checked', false);
+                        $('input:checkbox[name="itClaim"]').prop('checked', false);
+                    }
+
+                    $('#fileupload #itMemo').val(client.itMemo);
+
+                    $('#fileupload #itReqAddr').val(client.itReqAddr);
+                    $('#fileupload #itDeliAddr').val(client.itDeliAddr);
+
+                    $('#fileupload #itAddChg').val(client.itAddChg);
+                    $('#fileupload #itBaekInDt').val(client.itBaekInDt);
+
+//                    2월15일 추가
+                    $('#fileupload #itRegiDt').val(client.itRegiDt);
+                    $('#fileupload #itClaimDt').val(client.itClaimDt);
+                    $('#fileupload #itRefund').val(client.itRefund);
+                    $('#fileupload #itBeginTac').val(client.itBeginTac);
+                    $('#fileupload #itRegiStaff').val(client.itRegiStaff);
+                    $('#fileupload #itFactoryMemo').val(client.itFactoryMemo);
+
+    //                alert(client.itReqAddr +' @ '+ client.itDeliAddr);
+
+    //                수거지 주소, 배송지 주소 : Onload시에 미리 처리, 회원id 변경시에만 처리
+    /*                var vMbrId = $('#mbCd').val();
+                    if(vMbrId) {
+                        fnMakeMbAddrCmb2(vMbrId);
+                    }*/
+
+    //                사진처리
+                    initImgs();
+
+    //alert(client.orCd +' '+ client.id);
+
+                    setImages(client.orCd, client.id);
+                };
+
+                var selectItem = function(item) {
+    //                push 전에 중복여부 확인 필요
+                    if($.inArray( item, selectedItems ) != -1) {
+    //                    console.log('중복됨 : '+ $.inArray( item, selectedItems ));
+                    } else {
+    //                    console.log('추가됨');
+                        selectedItems.push(item);
+                    }
+
+                };
+
+                var unselectItem = function(item) {
+                    selectedItems = $.grep(selectedItems, function(i) {
+                        return i !== item;
+                    });
+                };
+
+                var deleteSelectedItems = function() {
+                    if(!selectedItems.length || !confirm("Are you sure?"))
+                        return;
+
+                    var $grid = $("#jsGrid");
+
+                    $.each(selectedItems, function(_, item) {
+                        $grid.jsGrid("deleteItem", item);
+                    });
+
+                    selectedItems = [];
+                };
+
+    //            그리드 삭제 처리
+                $('#btnDelete3').click(function () {
+                    fnDeleteGrid();
+                });
+
+                var fnDeleteGrid = function() {
+                    if(!selectedItems.length) {
+                        alert('삭제할 데이터를 선택해 주세요!')
+                        return;
+                    }
+
+                    if(!confirm(selectedItems.length +'건의 데이터를 삭제 하시겠습니까?')) {
+                        return;
+                    }
+
+                    ids = [];
+
+                    $.each(selectedItems, function(_, item) {
+    //                    console.log(''+ item.id);
+                        ids.push(item.id);
+                    });
+
+                    $.ajax({
+                        type : "POST",
+                        cache : false,
+                        url : '/order/deleteGrid',
+                        data : { items: ids },
+                        traditional: true,
+                        success : function(data, status) {
+                            fnSaveAmountCnt();
+                            alert('삭제 하였습니다!');
+                            fnSearch2();
+                        },
+                        error : function(data, status) {
+                            alert('삭제중 에러가 발생하였습니다.');
+    //                        console.log('실패 '+ data);
+                        }
+                    });
+
+                };
+
+                $("#regfrm").validate({
+                    submitHandler: function() {
+                        var f = confirm("저장 하시겠습니까?");
+                        if(f){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    },
+
+                    rules: {
+                        'orMemo' : {
+                            maxlength : 2000
+                        },
+                        'orReqDt' : {
+                            required : true,
+                        },
+                        'orReqAddr' : {
+                            required : true,
+                        }
+
+                        /*,
+                        'bnOpenTm2' : {
+                            required : true,
+                            range: [0, 60]
+                        },
+                        'bnTransTm' : {
+                            required : true,
+                            number : true
+                        },
+                        'bnDeliTm' : {
+                            required : true,
+                            number : true
+                        }*/
+                    },
+
+                    messages : {
+                        'orMemo' : {
+                            maxlength : "주문비고는 {0}자 이하로 입력해 주세요."
+                        },
+                        'orReqDt' : {
+                            required : '수거예정일시를 선택해 주세요.',
+                        },
+                        'orReqAddr' : {
+                            required : '수거지 주소를 선택해 주세요.',
+                        }
+                    },
+
+                    /*groups: {
+                     'code': 'cdGp cdIt'
+                     },*/
+
+                    /* http://jqueryvalidation.org/validate/ */
+                    errorElement: "div",
+                    wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        /*if (element.attr('name') == 'mgDt') {
+                         error.insertAfter('.input-group.date');
+                         } else {*/
+                        error.insertAfter(element);
+    //                        }
+                    }
+                });
+
+    //            alert('regfrm validate');
+    //        신규일때만 중복체크
+                /*if($('#regfrm > #mode').val() == 'new') {
+
+                    $.each( $( '#pdLvl1, #pdLvl2, #pdLvl3' ), function() {
+    //                    alert($(this).attr('id'));
+                        $(this).rules('add', {
+                            remote: {
+                                url: "/order/check-code",
+                                type: "get",
+                                data: {
+                                    pdLvl1: function() {
+                                        return $( '#pdLvl1' ).val();
+                                    },
+                                    pdLvl2: function() {
+                                        return $( '#pdLvl2' ).val();
+                                    },
+                                    pdLvl3: function() {
+                                        return $( '#pdLvl3' ).val();
+                                    }
+                                }
+                            },
+                            messages: {
+                                remote : '이미 존재하는 상위/중위/하위코드 조합입니다!'
+                            }
+                        });
+                    });
+
+                }*/
+
+            });
+
+            (function() {
+
+                var pdLvls = [];
+
+                var db = {
+                    loadData: function(filter) {
+                        var d = $.Deferred();
+                        filter.orCd = $('#regfrm #orCd').val();
+
+                        $.ajax({
+                            url: '/order/items/list',
+                            dataType: 'json',
+                            data: filter
+                        }).done(function(response) {
+
+                            var vCnt = 0;
+                            var vTot = 0;
+    //alert(response.content.length);
+                            if(response.content && response.content.length > 0) {
+                                vCnt = response.content.length;
+                                $.each(response.content, function (idx, obj) {
+    //                            vCnt += obj['itCnt'];
+    //                                vTot += obj['itPrice'];
+                                    vTot += obj['itTotPrice'];
+    //                            console.log(obj['itCnt'] +' @ '+ obj['itPrice']);
+                                });
+                            }
+
+    //                        $('#spanItemsCnt').text('총 '+ formatNumber(vCnt) +'개');
+                            $('#spanItemsCnt').text('총 '+ formatNumber(vCnt) +'개');
+                            $('#spanItemsTot').text(formatNumber(vTot) +'원');
+    //                        alert(vCnt +' @ '+ vTot);
+
+                            d.resolve(response.content);
+                        });
+
+                        return d.promise();
+                    }
+                };
+
+                window.db = db;
+
+                db.status = [];
+                var vStatus = [[${cmb_status}]];
+
+                for(var i=0; i<vStatus.length ; i++) {
+    //                console.log(i +' = '+ vStatus[i]['cdGp'] +' , '+ vStatus[i]['cdNm']);
+                    db.status.push({Id: vStatus[i]['cdGp'] + vStatus[i]['cdIt'], Name: vStatus[i]['cdNm']});
+                }
+    //            alert(db.status.length);
+            }());
+
+    //        품목 리스트 리스트 그리드 검색
+            function fnSearch2() {
+                $('#jsGrid').jsGrid('search');
+                selectedItems = [];
+                $('#checkAll').prop("checked", false);
+            }
+
+    //        품목 리스트 신규 처리
+            function fnNew() {
+                $("#bnBarCd").attr("readonly", false);
+//                $( '#bnBarCd' ).trigger( 'keyup' );
+                getBnTacNo();
+
+                $('#fileupload #id').val(null);
+                $('#fileupload #orCd').val($('#regfrm #orCd').val());
+                $('#fileupload #mode').val('new');
+                $('#fileupload #regiDt').val(null);
+
+                $('#fileupload #user').val(null);
+
+    //                품목 콤보
+                $('#fileupload #pdLvl1').val("");
+                $('#fileupload #pdLvl2').val("");
+                $('#fileupload #pdLvl3').val("");
+
+                $('#fileupload #pdLvl2').data('lvl', null);
+                $('#fileupload #pdLvl3').data('lvl', null);
+
+                $('#fileupload #itTac').val(null);
+                $('#fileupload #itPrice').val(null);
+                $('#fileupload #itCnt').val(null);
+                $('#fileupload #itBrand').val(null);
+
+                $('#fileupload #itColor').val(null);
+                $('#fileupload #itPatten').val(null);
+                $('#fileupload #itClMemo').val(null);
+                $('#fileupload #itReqAddr').val(null);
+                $('#fileupload #itReqAddr').val(null);
+                $('#fileupload #itInDt').val(null);
+                $('#fileupload #itOutDt').val(null);
+
+    //            반품 여부
+    //            $('input:checkbox[name="itClaim"]').val(null);
+                $('input:checkbox[name="itClaim"]').attr('checked', false);
+
+                $('#fileupload #itMemo').val(null);
+                $('#fileupload #itBaekInDt').val(null);
+
+                //            주소및 진행상태
+                $("#fileupload #itReqAddr option:eq(0)").attr('selected', 'selected');
+                $("#fileupload #itDeliAddr option:eq(0)").attr('selected', 'selected');
+
+//                진행상태가 주문 마스터 정보의 주문상태 값으로 디폴트 값 설정
+//                $("#fileupload #itStatus option:eq(0)").attr('selected', 'selected');
+
+                $('#fileupload #itAddChg').val(null);
+
+                initImgs();
+
+                initfileupload();
+
+                validator2.resetForm();
+
+                /*주문정보의 수거예정일시(orReqDt), 수거일시(orVisitDt), 배송요청일시(orVisitDt), 배송일시(orDeliVisitDt) 가
+                 품목정보의 수거예정일시(itReqDt), 수거일시(itVisitDt), 배송예정일시(itDeliFuVisitDt), 배송일시(itDeliVisitDt)로 상속받아야 함.*/
+                $('#fileupload #itReqDt').val($('#regfrm #orReqDt').val());
+                $('#fileupload #itVisitDt').val($('#regfrm #orVisitDt').val());
+                $('#fileupload #itDeliFuVisitDt').val($('#regfrm #orVisitDt').val());
+                $('#fileupload #itDeliVisitDt').val($('#regfrm #orDeliVisitDt').val());
+
+    //            수거지 주소(orReqAddr), 배송지 주소(orAddr) -> itReqAddr, itDeliAddr
+                $('#fileupload #itReqAddr').val($('#regfrm #orReqAddr').val());
+                $('#fileupload #itDeliAddr').val($('#regfrm #orDeliAddr').val());
+
+                $('#pdLvl1').val('02');
+                $('#pdLvl1').trigger('change');
+
+                    /*console.log('orReqDt : '+ $('#regfrm #orReqDt').val());
+                    console.log('itReqDt : '+ $('#fileupload #itReqDt').val());*/
+
+    //            $('#divItReqDt').data('DateTimePicker').show();
+
+               /* console.log($('#regfrm #orVisitDt').val());
+                console.log($('#regfrm #orVisitDt').val());
+                console.log($('#regfrm #orDeliVisitDt').val());*/
+
+                $("#fileupload #itStatus").val($("#orStatus").val());
+//                alert($("#orStatus").val());
+            }
+
+            function setImages(vOrCd, vItCd) {
+                /*$.ajax({
+                    url: '/order/listPicture',
+                    data: {orCd: vOrCd, itCd: vItCd},
+                    dataType: 'json',
+                }).done(function (response) {
+                    $.each(response.content, function (idx, obj) {
+                        console.log(obj['ptCd'] +' = '+ obj['ptImgFile']);
+                        $('#item_img'+ obj['ptCd']).attr('src', obj['ptImgFile']);
+                        $('#item_img'+ obj['ptCd']).data('url', obj['ptImgFile']);
+                    });
+                });*/
+
+/*                $('#fileupload').fileupload({
+                    url: '/file/upload',
+                    formData: {orCd: vOrCd, itCd: vItCd}
+                });*/
+
+                fnGetImageList(vOrCd, vItCd);
+//                console.log('setImages : '+ vOrCd +' , '+ vItCd);
+            }
+
+            function initImgs() {
+                /*$.each($('#item_img1, #item_img2, #item_img3, #item_img4, #item_img5'), function () {
+                    $(this).attr('src', '/img/example/order_photo.png');
+                    $(this).data('url', null);
+                });
+
+                $.each($('#spnImgNm1, #spnImgNm2, #spnImgNm3, #spnImgNm4, #spnImgNm5'), function () {
+                    $(this).text('');
+                });*/
+
+/*                try {
+                    fnGetImageList(null, null);
+                } catch (e) {}*/
+
+                $('tbody.files').empty();
+
+                if($('#fileupload #id').val() && $('#fileupload #orCd').val()) {
+//                    $('#divPicures').fadeIn();
+                    $('#divPicures').show();
+                } else {
+//                    $('#divPicures').fadeOut();
+                    $('#divPicures').hide();
+                }
+
+//                console.log('initImgs');
+
+/*                $('#fileupload').fileupload({
+                    url: '/file/upload'
+                });*/
+            }
+
+            function fnSetMbrInfo(mbCd, mbNicNm, mbTel, mbEmail) {
+    //            alert('fnSetMbrInfo');
+                $('#mbCd').val(mbCd);
+                $('#mbNicNm').val(mbNicNm);
+                $('#mbTel').val(mbTel);
+                $('#mbEmail').val(mbEmail);
+
+    //            회원에 따른 주소 콤보 Ajax 구성
+                if(mbCd) {
+                    fnMakeMbAddrCmb(mbCd);
+                    fnMakeMbAddrCmb2(mbCd);
+                }
+            }
+
+            function test() {
+
+
+    //            이미지 테스트
+    /*            $.ajax({
+                    url: '/order/listPicture?orCd=1&itCd=1',
+                    dataType: 'json',
+                }).done(function (response) {
+                    $.each(response.content, function (idx, obj) {
+                        console.log(obj['ptCd'] +' = '+ obj['ptImgFile']);
+                        $('#item_img'+ obj['ptCd']).attr('src', obj['ptImgFile']);
+                    });
+                });*/
+
+    /*            $('#divItemsForm').load('/etc/OrderItemsForm', {id: 1});
+                alert(1);*/
+
+    //            $('#cmbitem2').load('/etc/ProductCombo2', {pdLvl1: '01', pdLvl2: '00', pdLvl3: '00'});
+    //            $('#myFrag').load('/etc/ProductCombo', {pdLvl1: '01'});
+
+                /*$('#bnOpenTm1').val('8');
+                 $('#bnOpenTm2').val('23');
+                 $('#bnCloseTm1').val('23');
+                 $('#bnCloseTm2').val('45');
+                 $('#bnTransTm').val('70');
+                 $('#bnDeliTm').val('80');*/
+            }
+
+    //        주문정보의 수거지 주소, 배송지 주소 콤보를 회원의 최근 배송목록으로 채움
+            function fnMakeMbAddrCmb(vMbrId) {
+                $('#orReqAddr').load('/manage/member/mbrAddressCmb', {mbCd: vMbrId}, function() {
+    //                alert( "회원 주소콤보 로드됨! ");
+                });
+
+                $('#orDeliAddr').load('/manage/member/mbrAddressCmb', {mbCd: vMbrId}, function() {
+    //                alert( "회원 주소콤보 로드됨!" );
+                });
+            }
+
+    //        품목 정보의 수거지 주소, 배송지 주소 콤보를 회원의 최근 배송목록으로 채움
+            function fnMakeMbAddrCmb2(vMbrId) {
+                $('#itReqAddr').load('/manage/member/mbrAddressCmb', {mbCd: vMbrId}, function() {
+    //                alert( "회원 주소콤보 로드됨! ");
+                    initfileupload();
+                });
+
+                $('#itDeliAddr').load('/manage/member/mbrAddressCmb', {mbCd: vMbrId}, function() {
+    //                alert( "회원 주소콤보 로드됨!" );
+                    initfileupload();
+                });
+            }
+
+            function initfileupload() {
+                validator2 = $("#fileupload").validate({
+                    /*                submitHandler: function() {
+                     if(!confirm("저장 하시겠습니까?")) return false;
+
+                     $.ajax({
+                     url: '/order/saveOrderItems',
+                     type : "POST",
+                     data: $('#fileupload').serialize(),
+                     cache : false,
+                     //                        http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
+                     processData: false, // Don't process the files
+                     contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+                     success : function(data, status) {
+                     alert("저장 하였습니다!");
+                     fnSearch2();
+                     },
+                     error : function(data, status) {
+                     alert('저장중 에러가 발생하였습니다.');
+                     }
+                     });
+
+                     return false;
+                     },*/
+
+                    rules: {
+                        /*'itTac' : {
+                            required : true
+                        },*/
+                        'pdLvl1' : {
+                            required : true
+                        },
+                        'pdLvl2' : {
+                            required : true
+                        },
+                        'pdLvl3' : {
+                            required : true
+                        },
+                        'itReqDt' : {
+                            required : true
+                        },
+                        'itVisitDt' : {
+                            required : true
+                        },
+                        'itMemo' : {
+                            maxlength : 1000
+                        },
+                        /*'itStatus' : {
+                            required : true
+                        },*/
+                        'itReqAddr' : {
+                            required : true
+                        },
+                        'itDeliAddr' : {
+                            required : true
+                        }/*,
+                        'bnBarCd' : {
+                            number : true
+                        }*/
+                    },
+
+                    messages : {
+                        /*'itTac' : {
+                            required : '택번호를 입력해 주세요.'
+                        },*/
+                        'pdLvl1' : {
+                            required : '품목 상위코드를 선택해 주세요.'
+                        },
+                        'pdLvl2' : {
+                            required : '품목 중위코드를 선택해 주세요.'
+                        },
+                        'pdLvl3' : {
+                            required : '품목 하위코드를 선택해 주세요.'
+                        },
+                        'itReqDt' : {
+                            required : '수거예정일시를 선택해 주세요.'
+                        },
+                        'itVisitDt' : {
+                            required : '수거일시를 선택해 주세요.'
+                        },
+                        'itMemo' : {
+                            maxlength : '품목비고는 {0}자 이하로 입력해 주세요.'
+                        },
+                        /*'itStatus' : {
+                            required : '진행상태를 선택해 주세요.'
+                        },*/
+                        'itReqAddr' : {
+                            required : '수거지 주소를 선택해 주세요.'
+                        },
+                        'itDeliAddr' : {
+                            required : '배송지 주소를 선택해 주세요.'
+                        }/*,
+                        'bnBarCd' : {
+                            number : '시작 택번호는 숫자만 입력해 주세요.'
+                        }*/
+                    },
+
+                    errorElement: "div",
+                    wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        if (element.attr('name') == 'pdLvl1' || element.attr('name') == 'pdLvl2' || element.attr('name') == 'pdLvl3') {
+                            error.insertAfter('#pdLvl3');
+                        } else if (element.attr('name') == 'itReqDt') {
+                            error.insertAfter('#divItReqDt');
+                        } else if (element.attr('name') == 'itVisitDt') {
+                            error.insertAfter('#divItVisitDt');
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+                });
+    //            alert('X');
+            }
+        /*]]>*/
+        </script>
+    </head>
+    <body>
+
+    <div layout:fragment="content">
+
+    <!--    <select id="cmbitem2" name="cmbitem2">
+            &lt;!&ndash;<option th:text="#{select_item}">Select item...</option>&ndash;&gt;
+            <option th:each="item : ${itemList}" th:value="${item.id}" th:text="${item.pdNm}">My item</option>
+        </select>-->
+
+    <!--<div id="myFrag"></div>-->
+
+<!--    <div th:fragment="myFrag">
+        <ul th:each="p : ${itemList}">
+            <li th:text="${p.pdNm}">One product</li>
+        </u
+    </div>-->
+
+    <form th:object="${order}" th:action="@{/accept/order/saveOrder}" method="post" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{orCd}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <!--<input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>-->
+        <input type="hidden" th:field="*{mode}"/>
+
+        <input type="hidden" th:field="*{mbCd}"/>
+
+        <div class="search_area">
+            <h2 class="page_title">
+                주문정보
+                <!--<a class="yell_btn" href="/accept/order/list">닫기</a>-->
+                <a class="yell_btn" id="btnBack">닫기</a>
+                <a class="yell_btn" id="btnDelete" th:if="${order.mode != 'new'}" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">삭제</a>
+                <a class="yell_btn" id="btnSave">저장</a>
+                <a class="yell_btn" id="btnChangeSt2" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">입고완료</a>
+                <a class="yell_btn" id="btnChangeSt1" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">검수완료</a>
+                <a class="yell_btn" id="btnChangeSt3" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">수거완료</a>
+            </h2>
+            <div class="input_area">
+
+                <div class="col harf">
+                    <label>주문번호</label>
+                    <!--<input type="text" class="popup_input" maxlength="20" th:field="*{orCd2}" readonly="readonly" />-->
+                    <th:block th:text="*{orCd2}"></th:block>
+                </div>
+
+                <div class="col harf time">
+                    <label>검수일시</label>
+                    <div class='input-group date' id='divOrAcceptDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{orAcceptDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>주문일시</label>
+                    <!--<div class="input-group date">
+                        <input type="text" maxlength="10" class="popup_input" disabled="disabled" />
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>-->
+
+                    <div class='input-group date' id='divOrOrderDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{orOrderDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf">
+                    <label>비회원 주문여부</label>
+                    <select th:field="*{orNonMberYn}">
+                        <option value="N">비회원 주문</option>
+                        <option value="M">회원주문</option>
+                    </select>
+                </div>
+
+                <div class="col harf">
+                    <label>지점</label>
+                    <select th:field="*{bnCd}">
+                        <option th:each="cd : ${branch_cds}"
+                                th:value="${cd[0]}"
+                                th:text="${cd[1]}">text</option>
+                    </select>
+                </div>
+
+                <div class="col harf">
+                    <label>주문상태</label>
+                    <select class="front" th:field="*{orStatus}">
+                        <option th:each="cd : ${cmb_status}"
+                                th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                                th:text="${cd.cdNm}">text</option>
+                    </select>
+                </div>
+
+                <div class="col harf">
+                    <label>아이디</label>
+                    <!--<input type="text" class="popup_input id" maxlength="50" readonly="readonly" id="mbEmail" name="mbEmail" value="" />-->
+                    <input type="text" class="popup_input id" maxlength="50" th:field="*{mbEmail}" readonly="readonly" />
+                    <button type="button" id="btnFindMbr">고객찾기</button>
+                    <button type="button" id="btnAddMbr">고객추가</button>
+                    <!--<button type="button" id="btnModifyMbr">고객수정</button>-->
+                </div>
+
+                <div class="col harf">
+                    <label>닉네임</label>
+                    <input type="text" class="popup_input" maxlength="50" th:field="*{mbNicNm}" readonly="readonly" />
+                    <!--<button>검색</button>-->
+                </div>
+
+                <div class="col harf">
+                    <label>연락처</label>
+                    <input type="text" class="popup_input" maxlength="20" th:field="*{mbTel}" readonly="readonly" />
+                </div>
+
+                <div class="col harf">
+                    <label>주문금액</label>
+                    <input type="text" class="popup_input" maxlength="7" th:field="*{orPrice}" />
+                </div>
+
+                <!-- 2015-12-02 토글 감싸는 div 추가 -->
+                <div class="toggle_all">
+
+                    <div class="col harf">
+                        <label>배송비</label>
+                        <input type="text" class="popup_input" maxlength="7" th:field="*{orDelivery}" />
+                    </div>
+
+                    <div class="col harf">
+                        <label>할인금액</label>
+                        <input type="text" class="popup_input" maxlength="7" th:field="*{orDiscount}" />
+                    </div>
+
+                    <div class="col harf">
+                        <label>기타금액</label>
+                        <input type="text" class="popup_input" maxlength="7" th:field="*{orExtMoney}" />
+                    </div>
+
+                    <div class="col harf">
+                        <label>결제금액</label>
+                        <input type="text" class="popup_input" maxlength="20" th:field="*{orCharge}" />
+                    </div>
+
+                    <div class="col harf d_none">
+                        <label>정기결제</label>
+                        <select th:field="*{orRegularPay}">
+                            <option value="N">미등록</option>
+                            <option value="Y">등록</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
+                        <label>포인트</label>
+                        <input type="text" class="popup_input" th:field="*{orPoint}" maxlength="7" />
+                    </div>
+
+                    <div class="col">
+                        <label>수량</label>
+                        <input type="text" class="popup_input" th:field="*{orCnt}" />
+                    </div>
+
+                    <div class="col">
+                        <label class="order_note">결제비고</label>
+                        <textarea class="textarea" th:field="*{orChargeMemo}"></textarea>
+                    </div>
+
+                    <div class="col harf">
+                        <label>수거지 주소</label>
+                        <select th:field="*{orReqAddr}" class="address">
+                            <option value="">수거지 주소선택</option>
+                            <option th:each="item : ${address_list}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+                        </select>
+                        <button type="button" id="btnModifyAddr">주소수정</button>
+                    </div>
+
+                    <div class="col harf">
+                        <label>배송지 주소</label>
+                        <select th:field="*{orDeliAddr}">
+                            <option value="">배송지 주소선택</option>
+                            <option th:each="item : ${address_list}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+                        </select>
+                    </div>
+
+                    <div class="col harf time">
+                        <label>수거예정일시</label>
+                        <div class='input-group date' id='divOrReqDt'>
+                            <input type='text' class="form-control popup_input" th:field="*{orReqDt}" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col harf time">
+                        <label>배송요청일시</label>
+                        <div class='input-group date' id='divOrDeliFuVisitDt'>
+                            <input type='text' class="form-control popup_input" th:field="*{orDeliFuVisitDt}" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col harf time">
+                        <label>수거일시</label>
+                        <div class='input-group date' id='divOrVisitDt'>
+                            <input type='text' class="form-control popup_input" th:field="*{orVisitDt}" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col harf time">
+                        <label>배송일시</label>
+                        <div class='input-group date' id='divOrDeliVisitDt'>
+                            <input type='text' class="form-control popup_input" th:field="*{orDeliVisitDt}" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col harf">
+                        <label>수거크린매니저</label>
+                        <!--<input type="text" class="popup_input" maxlength="50" th:field="*{epCd}" />-->
+                        <select th:field="*{epCd}">
+                            <option value="">크린매니저선택</option>
+                            <option th:each="cd : ${employee_cds}"
+                                    th:value="${cd[0]}"
+                                    th:text="${cd[1]}">text</option>
+                        </select>
+                    </div>
+                    <div class="col harf">
+                        <label>배송크린매니저</label>
+                        <!--<input type="text" class="popup_input" maxlength="20" disabled="disabled" />-->
+                        <select th:field="*{orDeliEpCd}">
+                            <option value="">크린매니저선택</option>
+                            <option th:each="cd : ${employee_cds}"
+                                    th:value="${cd[0]}"
+                                    th:text="${cd[1]}">text</option>
+                        </select>
+                    </div>
+
+                    <div class="col harf">
+                        <label>반품 여부</label>
+                        <!--<select class="front">
+                            <option value="0">해당없음</option>
+                            <option value="1">반품요청</option>
+                        </select>-->
+                        <input type="checkbox" th:field="*{orClaim}" value="Y" />
+                    </div>
+                    <div class="col harf time">
+                        <label>반품 일시</label>
+                        <div class='input-group date' id='divOrClaimDt'>
+                            <input type='text' class="form-control popup_input" th:field="*{orClaimDt}" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col harf">
+                        <label>환불여부</label>
+                        <!--<select class="front">
+                            <option value="0">해당없음</option>
+                            <option value="1">환불요청</option>
+                        </select>-->
+                        <input type="checkbox" th:field="*{orRefund}" value="Y" />
+                    </div>
+                    <div class="col harf">
+                        <label>결제여부</label>
+                        <!--<select class="front" th:field="*{orChargeType}">
+                            <option value="0">해당없음</option>
+                            <option value="1">결제완료</option>
+                        </select>-->
+                        <input type="checkbox" th:field="*{orChargeType}" value="Y" />
+                    </div>
+
+                    <div class="col harf">
+                        <label>사고여부</label>
+                        <!--<select class="front" th:field="*{orAccident}">
+                            <option value="0">해당없음</option>
+                            <option value="1">사고</option>
+                        </select>-->
+                        <input type="checkbox" th:field="*{orAccident}" value="Y" />
+                    </div>
+                    <div class="col harf">
+                        <label>접수채널</label>
+                        <select class="front" th:field="*{orChannel}">
+                            <option value="1">카톡</option>
+                            <option value="2">앱 (ios,안드로이드)</option>
+                            <option value="3">전화</option>
+                            <option value="4">직접방문</option>
+                            <option value="5">기타</option>
+                        </select>
+                    </div>
+
+                    <div class="col harf">
+                        <label>변경자</label>
+                        <input type="text" class="popup_input" maxlength="50" th:field="*{user}" readonly="readonly" />
+                    </div>
+                    <div class="col harf">
+                        <label>변경일시</label>
+                        <input type="text" class="popup_input" maxlength="20" th:field="*{regiDt}" readonly="readonly" />
+                    </div>
+
+                    <div class="col">
+                        <label class="order_note">주문비고</label>
+                        <textarea class="textarea" th:field="*{orMemo}"></textarea>
+                    </div>
+
+                    <div class="col">
+                        <label class="order_note">방문목적</label>
+                        <textarea class="textarea" th:field="*{orVisitPurpose}"></textarea>
+                    </div>
+                </div>
+                <!-- 2015-12-02 토글 감싸는 div 추가 끝 -->
+                <!-- 2015-12-02 토글 버튼 추가 -->
+                <a class="toggle_control"></a>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="table_area harf">
+        <h2 class="page_title">
+            품목 리스트
+            <!--<a class="add_brn" id="btnAdd"><img src="/img/add_icon.png" alt="" /></a>-->
+            <a class="add_brn textbtn" id="btnAdd" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">세탁물 등록</a>
+            <a class="add_brn textbtn" id="btnDelete3" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">삭제</a>
+        </h2>
+        <div class="total">
+            <span id="spanItemsCnt">총 개</span>
+            <span class="total_pay" id="spanItemsTot">원</span>
+        </div>
+        <div id="jsGrid" class="table_area"></div>
+    </div>
+
+    <div class="add_data">
+        <h2 class="page_title">
+            품목 정보
+            <a class="yell_btn" id="btnDelete2" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">삭제</a>
+            <a class="yell_btn" id="btnSave2">저장</a>
+        </h2>
+
+        <div class="add_data_area" id="divItemsForm">
+            <form th:object="${orderitems}" th:action="@{/order/saveOrderItems}" method="post" id="fileupload" name="fileupload" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{id}"/>
+                <input type="hidden" th:field="*{orCd}"/>
+                <!--<input type="hidden" name="orCd" vlaue="0"/>-->
+
+                <input type="hidden" th:field="*{delYn}"/>
+                <input type="hidden" th:field="*{evtNm}"/>
+                <!--<input type="hidden" th:field="*{regiDt}"/>-->
+                <!--<input type="hidden" th:field="*{user}"/>-->
+                <input type="hidden" th:field="*{mode}"/>
+                <input type="hidden" name="itCd" value="0"/>
+
+                <!--2월15일 java.lang.NumberFormatException: For input string: "" 에러로 추가-->
+                <input type="hidden" th:field="*{itBrand}"/>
+                <input type="hidden" th:field="*{itCnt}"/>
+                <input type="hidden" th:field="*{itColor}"/>
+                <input type="hidden" th:field="*{itPatten}"/>
+
+                <input type="hidden" th:field="*{itRegiDt}"/>
+                <input type="hidden" th:field="*{itClaimDt}"/>
+                <input type="hidden" th:field="*{itRefund}"/>
+                <input type="hidden" th:field="*{itBeginTac}"/>
+                <input type="hidden" th:field="*{itRegiStaff}"/>
+                <input type="hidden" th:field="*{itFactoryMemo}"/>
+
+                <!--
+                `IT_ADD_CHG`          INT           NULL     COMMENT '추가요금'
+                `IT_CLAIM_DT`         DATETIME      NULL     COMMENT '반품일시'
+                `IT_REFUND`           VARCHAR(4)       NULL     COMMENT '환불여부'
+                -->
+
+                <div class="col">
+                    <label>시작 택번호</label>
+                    <!--<input type="text" class="popup_input" th:value="${bnBarCd}" id="bnBarCd" readonly="readonly" />-->
+                    <input type="text" class="popup_input" th:value="${bnBarCd}" id="bnBarCd" th:readonly="${orderitems.mode != 'new'}" />
+                    <span id="errmsg"></span>
+                </div>
+
+                <div class="col">
+                    <label>택번호</label>
+                    <input type="text" class="popup_input" th:field="*{itTac}" readonly="readonly" />
+                </div>
+                <div class="col" id="pdLvl">
+                    <label>품목명</label>
+                    <select class="product_select" th:field="*{pdLvl1}">
+                        <!--<option th:text="#{select_item}">Select item...</option>-->
+                        <option value="">선택해주세요</option>
+                        <option th:each="item : ${pdLvl1s}" th:value="${item.pdLvl1}" th:text="${item.pdNm}">My item</option>
+                    </select>
+
+                    <select class="product_select" th:field="*{pdLvl2}">
+                        <!--<option th:text="#{select_item}">Select item...</option>-->
+                        <!--<option th:each="item : ${itemList}" th:value="${item.id}" th:text="${item.pdNm}">My item</option>-->
+                    </select>
+
+                    <select class="product_select" th:field="*{pdLvl3}">
+                        <!--<option>프리미엄</option>
+                        <option>일반</option>-->
+                    </select>
+                </div>
+
+                <div class="col">
+                    <label>가격</label>
+                    <input type="text" class="popup_input" th:field="*{itPrice}" />
+                </div>
+
+                <div class="col">
+                    <label>추가 요금</label>
+                    <input type="text" class="popup_input" th:field="*{itAddChg}" />
+                </div>
+
+                <div class="col">
+                    <label>세탁내용</label>
+                    <input type="text" class="popup_input" th:field="*{itClMemo}" />
+                </div>
+
+                <div class="col product_note">
+                    <label>품목비고</label>
+                    <textarea th:field="*{itMemo}"></textarea>
+                </div>
+                <div class="col" id="divPicures" style="display: none">
+                    <label class="order_photo edit">사진정보</label>
+
+                    <div class="row fileupload-buttonbar">
+                        <div class="col-lg-7">
+                            <!-- The fileinput-button span is used to style the file input field as button -->
+                            <span class="btn btn-success fileinput-button">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                <span>파일추가</span>
+                                <input type="file" name="files[]" multiple="multiple" />
+                            </span>
+                            <button type="submit" class="btn btn-primary start">
+                                <i class="glyphicon glyphicon-upload"></i>
+                                <span>파일 업로드</span>
+                            </button>
+                            <button type="reset" class="btn btn-warning cancel">
+                                <i class="glyphicon glyphicon-ban-circle"></i>
+                                <span>업로드 취소</span>
+                            </button>
+                            <button type="button" class="btn btn-danger delete">
+                                <i class="glyphicon glyphicon-trash"></i>
+                                <span>삭제</span>
+                            </button>
+                            <input type="checkbox" class="toggle" />
+                            <!-- The global file processing state -->
+                            <span class="fileupload-process"></span>
+                        </div>
+                        <!-- The global progress state -->
+                        <div class="col-lg-5 fileupload-progress fade">
+                            <!-- The global progress bar -->
+                            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100">
+                                <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+                            </div>
+                            <!-- The extended global progress state -->
+                            <div class="progress-extended">&nbsp;</div>
+                        </div>
+                    </div>
+                    <!-- The table listing the files available for upload/download -->
+                    <table role="presentation" class="table table-striped">
+                        <tbody class="files"></tbody>
+                    </table>
+                </div>
+
+                <div class="col">
+                    <label>수거지 주소</label>
+                    <select  th:field="*{itReqAddr}">
+                        <option value="">수거지 주소선택</option>
+                        <option th:each="item : ${address_list}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+                    </select>
+                </div>
+
+                <div class="col">
+                    <label>배송지 주소</label>
+                    <select  th:field="*{itDeliAddr}">
+                        <option value="">배송지 주소선택</option>
+                        <option th:each="item : ${address_list}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+                    </select>
+                </div>
+
+                <div class="col harf time">
+                    <label>수거예정일시</label>
+                    <div class='input-group date' id='divItReqDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itReqDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>수거일시</label>
+                    <div class='input-group date' id='divItVisitDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itVisitDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>공장입고일시</label>
+                    <div class='input-group date' id='divItInDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itInDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>공장출고일시</label>
+                    <div class='input-group date' id='divItOutDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itOutDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>배송예정일시</label>
+                    <div class='input-group date' id='divItDeliFuVisitDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itDeliFuVisitDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>배송일시</label>
+                    <div class='input-group date' id='divItDeliVisitDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itDeliVisitDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf time">
+                    <label>빨래통입고일시</label>
+                    <div class='input-group date' id='divItBaekInDt'>
+                        <input type='text' class="form-control popup_input" th:field="*{itBaekInDt}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col harf">
+                    <label>반품 여부</label>
+                    <input type="checkbox" th:field="*{itClaim}" value="Y" />
+                    <!--<input type="checkbox" id="itClaim" name="itClaim" value="Y" />-->
+                </div>
+
+                <div class="col harf">
+                    <label>검수크린매니저</label>
+                    <input type="text" class="popup_input" maxlength="20" th:field="*{user}" readonly="readonly" />
+                </div>
+                <div class="col harf">
+                    <label>검수일시</label>
+                    <input type="text" class="popup_input" maxlength="20" th:field="*{regiDt}" readonly="readonly" />
+                </div>
+
+                <div class="col">
+                    <label>진행상태</label>
+                    <select th:field="*{itStatus}">
+                        <option th:each="cd : ${cmb_status}"
+                                th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                                th:text="${cd.cdNm}">text</option>
+                    </select>
+                </div>
+
+                <!-- -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+                <!--<div class="col harf">
+                    <label>수량</label>
+                    <input type="text" class="popup_input" th:field="*{itCnt}" />
+                </div>
+                <div class="col harf">
+                    <label>브랜드</label>
+                    <input type="text" class="popup_input" th:field="*{itBrand}" />
+                </div>
+                <div class="col harf">
+                    <label>색상</label>
+                    <input type="text" class="popup_input" th:field="*{itColor}" />
+                </div>
+                <div class="col harf">
+                    <label>무늬</label>
+                    <input type="text" class="popup_input" th:field="*{itPatten}" />
+                </div>-->
+            </form>
+        </div>
+
+    </div>
+
+        <!-- The blueimp Gallery widget -->
+        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+            <div class="slides"></div>
+            <h3 class="title"></h3>
+            <a class="prev">‹</a>
+            <a class="next">›</a>
+            <a class="close">×</a>
+            <a class="play-pause"></a>
+            <ol class="indicator"></ol>
+        </div>
+
+        <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+        <script src="/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+        <!-- The Templates plugin is included to render the upload/download listings -->
+        <script src="//blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
+        <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+        <script src="//blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
+        <!-- The Canvas to Blob plugin is included for image resizing functionality -->
+        <script src="//blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
+        <!-- Bootstrap JS is not required, but included for the responsive demo navigation -->
+        <!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>-->
+        <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/bootstrap.min.js"
+                th:href="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+        <!-- blueimp Gallery script -->
+        <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+        <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+        <script src="/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
+        <!-- The basic File Upload plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload.js"></script>
+        <!-- The File Upload processing plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-process.js"></script>
+        <!-- The File Upload image preview & resize plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-image.js"></script>
+        <!-- The File Upload audio preview plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-audio.js"></script>
+        <!-- The File Upload video preview plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-video.js"></script>
+        <!-- The File Upload validation plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-validate.js"></script>
+        <!-- The File Upload user interface plugin -->
+        <script src="/jQuery-File-Upload/js/jquery.fileupload-ui.js"></script>
+        <!-- The main application script -->
+        <script src="/jQuery-File-Upload/js/main.js"></script>
+        <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
+        <!--[if (gte IE 8)&(lt IE 10)]>
+        <script src="/jQuery-File-Upload/js/cors/jquery.xdr-transport.js"></script>
+        <![endif]-->
+
+</div>
+
+</body>
+</html>

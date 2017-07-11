@@ -1,0 +1,79 @@
+﻿
+
+.table_title { background-color: #ffffff;  color: #12b9ee;  overflow: hidden;  border-bottom: 2px solid #12b9ee;  border-top: 1px solid #e7e7e7; border-left: 1px solid #e7e7e7;  border-right: 1px solid #e7e7e7;}
+.table_title div {float: left;padding: 14px 0;text-align: center;}
+.neme {width: 80px;}
+.schedule { width: 115px;}
+.address {width: 248px;}
+.codi { width: 80px;}
+.number {width: 90px;}
+.pay { width: 97px;}
+
+.dash_table { width: 57%; margin-left: 0.5%;float: left;  margin-top: 10px;}
+.dash_table.front{width: 42%; margin-left: 0; margin-right: 0.5%}
+.dash_table table{width: 100%}
+.dash_table table tr td{font-size: 10pt; text-align: center; padding: 14px 0; /* width:33%; */}
+.dash_table table thead tr td{ background-color:#31a4eb;color:#fff; }
+
+.dash_table table tbody tr td{ border-bottom: 1px solid #ddd; }
+
+.mCustomScrollbar#content-1 { height: 460px;background-color: #fff; border-bottom: 1px solid #e7e7e7; border-left: 1px solid #e7e7e7;  border-right: 1px solid #e7e7e7;}
+.mCustomScrollbar#content-2 { height: 460px;background-color: #fff; border-bottom: 1px solid #e7e7e7; border-left: 1px solid #e7e7e7;  border-right: 1px solid #e7e7e7;}
+.mCustomScrollbar#content-3{height: 210px;width: 85%;float: left;background-color: #fff; border-bottom: 1px solid #e7e7e7; border-left: 1px solid #e7e7e7;  border-right: 1px solid #e7e7e7; }
+.current_status ,.pm,.accrue_status { float: left; width: 100%;  margin-top:10px;}
+.current_status .current{background-color: #fff;}
+.current_status .current div{text-align: center;background-color: #fff; overflow: hidden; border: 1px solid #e7e7e7; }
+.current_status .current div p{font-size: 24pt; color:#12b9ee;width: 247px; float: left;padding: 25px 0;  }
+.current_status .current div>span{ display: block; width: 1px; background-color: #e7e7e7; height: 30px;float: left; margin-top: 50px;}
+
+.current_status .current div p span{font-size: 13pt;color: #444; display: block; padding-top: 20px}
+.current_status .current div p b {
+    font-weight: normal;
+    font-size: 13pt;
+}
+.accrue_status .current div{text-align: center;background-color: #fff; overflow: hidden; border: 1px solid #e7e7e7;}
+.accrue_status .current div p{font-size: 20pt; color:#12b9ee;width: 310px; float: left;padding: 20px 0; }
+.accrue_status .current div>span{ display: block; width: 1px; background-color: #e7e7e7; height: 30px;float: left; margin-top: 50px;}
+.accrue_status .current div p span{font-size: 13pt;color: #444; display: block; padding-top: 20px;}
+.pm{margin-bottom: 20px;}
+.pm .total {background-color: #ffffff;
+    color: #000;
+    width: 15%;
+    text-align: center;
+    float: left;
+    height: 254px;
+    padding: 102px 0;
+    font-size: 13pt;
+    border: 1px solid #e7e7e7;
+    border-right: none;}
+.pm .total span {
+    font-size: 24pt;
+    line-height: 140%;
+    display: block;
+    color: #12b9ee;
+}
+
+.pm .total span b {
+    font-size: 13pt;
+    font-weight: normal;
+}
+.pm .table_title { width: 85%;float: left;}
+.pm table{width: 100%}
+.pm table tr td{font-size: 10pt; text-align: center; padding: 14px 0; /* width:33%; */}
+.pm table thead tr td{ background-color:#31a4eb;color:#fff; }
+.pm table tbody tr td{ border-bottom: 1px solid #ddd; }
+.pm_neme {
+    width: 25%;
+}
+
+.pm_start {
+    width: 25%;
+}
+
+.pm_end {
+    width: 25%;
+}
+
+.pm_overlap {
+    width: 25%;
+}

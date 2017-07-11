@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>cleanbank:Login</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+<!--<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" 	href="../../css/bootstrap.min.css" />-->
+	<link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+		  th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}"
+		  rel="stylesheet" media="screen" />
+
+	<link href="../static/css/signin.css"
+		  th:href="@{/css/signin.css}" rel="stylesheet" media="screen"/>
+
+	<script src="http://cdn.jsdelivr.net/webjars/jquery/1.11.3/jquery.min.js"
+			th:src="@{/webjars/jquery/1.11.3/jquery.min.js}"></script>
+
+	<script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/bootstrap.min.js"
+			th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		"use strict";
+
+		$(document).ready(function(){
+			$('#btnLogin').click(function () {
+				var name = $('#txtUsername');
+				var pwd = $('#txtPassword');
+
+				if(!name.val()) {
+					alert('ID를 입력해 주세요!');
+					name.focus();
+					return;
+				}
+
+				if(!pwd.val()) {
+					alert('비밀번호를 입력해 주세요!');
+					pwd.focus();
+					return;
+				}
+
+				$('#frmLogin').submit();
+			});
+		});
+		/*]]>*/
+	</script>
+</head>
+<body>
+<div class="container">
+
+	<form class="form-signin" name="form" th:action="@{/login}" action="/login" method="POST" id="frmLogin">
+		<h2 class="form-signin-heading">
+			<img alt="" src="/img/login_logo.png" />
+		</h2>
+		<div class="btn-group btn-group-justified" data-toggle="buttons">
+			<label class="btn btn-primary active">
+				<input type="radio" name="user_gubun" value="1" id="option1" autocomplete="off" checked="checked" /> 본사관리자
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="user_gubun" value="2" id="option2" autocomplete="off" /> 지점장
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="user_gubun" value="3" id="option3" autocomplete="off" /> 크린매니저
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="user_gubun" value="4" id="option4" autocomplete="off" /> 공장
+			</label>
+
+		</div>
+
+		<div th:if="${param.logout}" class="login_chk">로그아웃 하였습니다.</div>
+		<div th:if="${param.error}" class="login_chk">로그인에 실패했습니다. 메일주소 및 암호를 확인 후 로그인을 시도해주시기 바랍니다.</div>
+
+		<input type="text" id="txtUsername" name="username" class="form-control" placeholder="ID" value="support@hellobiz.kr" />
+		<input type="password" id="txtPassword" name="password" class="form-control" placeholder="Password" value="1111" />
+		<a id="btnLogin" class="btn btn-lg btn-primary btn-block">로그인</a>
+
+		<div id="footer">
+			<div class="container">
+				<p class="text-muted credit">@2016 clean bank Co.,Ltd. All rights reserved</p>
+			</div>
+		</div>
+	</form>
+
+</div>
+
+</body>
+</html>

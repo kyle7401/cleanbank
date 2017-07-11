@@ -1,0 +1,73 @@
+Configutation:
+  status: warn
+  Appenders:
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d{ISO8601} %-5p [%c{3}:%L] [%t] %m%n"
+    RollingFile:
+      - name: APPLICATION
+        fileName: "/home/cleanbank/logs/cleanbank-app.log"
+        filePattern: "/home/cleanbank/logs/$${date:yyyy-MM}/cleanbank-app-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: "%d{ISO8601} %-5p [%c{3}:%L] [%t] %m%n"
+        policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+  Loggers:
+      Root:
+        level: error
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: APPLICATION
+      Logger:
+        - name: cleanbank
+          additivity: false
+          level: debug
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.context.support.StandardServletEnvironment
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.context.ContextLoader
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+
+        - name: org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver
+          additivity: error
+          level: warn
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION

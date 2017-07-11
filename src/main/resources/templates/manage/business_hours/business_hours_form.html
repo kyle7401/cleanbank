@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>영업시간 정보</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/bootstrap.min.js"
+            th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-timepicker.min.css" />
+    <script type="text/javascript" src="/js/bootstrap-timepicker.js"></script>
+
+    <style>
+        .pop_input_area .col {position: relative;}
+        div.error { position: absolute; top: 15px; background-color: transparent; left: 40px;width: 290px;}
+
+        .input_area .col .message {float: left;}
+        .input_area .message div#bnOpenTm1-error,.input_area .message div#bnCloseTm1-error {left: 210px;}
+        .input_area .message div.error {left: 455px; width: 115px;  top: 6px;}
+
+        .add_data_area .col .input-group.date #saDate-error{ color: #ff0000;left: 230px;}
+        .add_data_area .col #saMemo-error{color: #ff0000;left: 380px;}
+        .input_area .col.harf.time .input-group.bootstrap-timepicker.timepicker .message div.error { left: 305px;top: 0;}
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            init();
+//            test();
+//            alert('${branch.bnCd}');
+
+            fnNew();
+        });
+
+        function test() {
+            $('#bnOpenTm1').val('8');
+            $('#bnOpenTm2').val('23');
+            $('#bnCloseTm1').val('23');
+            $('#bnCloseTm2').val('45');
+            $('#bnTransTm').val('70');
+            $('#bnDeliTm').val('80');
+        }
+
+        function init() {
+            makeDatepicker('.input-group.date');
+
+//            상단 저장
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });
+
+//            하단 저장
+            $('#btnSave2').click(function () {
+                $('#regfrm2').submit();
+            });
+
+//            비영업일 리스트 신규
+            $('#btnAdd').click(function () {
+                fnNew();
+            });
+
+            $('#btnDelete').click(function () {
+                var vNo = $('#bnCd').val();
+//                alert(vNo);
+                if(!confirm("삭제 하시겠습니까?")) return false;
+                window.location.href = '/manage/business_hours/initBHours/'+ vNo;
+            });
+
+            $('#btnDelete2').click(function () {
+                var vNo = $('#regfrm2 #id').val();
+
+                if(!vNo) {
+                    alert('삭제할 대상을 선택해 주세요!');
+                    return false;
+                }
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/salesinfo/delete-salesinfo',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        fnSearch2();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+                    }
+                });
+
+            });
+        }
+
+        $(function(){
+
+            $('#jsGrid').jsGrid({
+                width: '100%',
+                height: 'auto',
+                paging: true,
+                pageSize: 5,
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function(args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    { name: 'id', title: '번호', type: 'number', align: 'center'},
+                    { name: 'saDate', title: '비영업일자', type: 'text', align: 'center'},
+                    { name: 'saMemo', title: '사유', type: 'text', align: 'center'}
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+                $('#regfrm2 #id').val(client.id);
+                $('#regfrm2 #bnCd').val(client.bnCd);
+                $('#regfrm2 #mode').val('edit');
+                $('#regfrm2 #regiDt').val(client.regiDt);
+                $('#regfrm2 #saDate').val(client.saDate);
+                $('#regfrm2 #saMemo').val(client.saMemo);
+/*                console.log('client.saDate : '+ client.saDate);
+                console.log('#regfrm2 #saDate : '+ $('#regfrm2 #saDate').val());*/
+            };
+
+            $("#regfrm2").validate({
+                submitHandler: function() {
+                    if(!confirm("저장 하시겠습니까?")) return false;
+
+                    $.ajax({
+                        type : "POST",
+                        url: '/salesinfo/saveSalesInfo',
+                        cache : false,
+                        data: $('#regfrm2').serialize(),
+                        success : function(data, status) {
+                            alert("저장 하였습니다!");
+                            fnSearch2();
+//                            window.location.href = '/manage/branch/list';
+                            /* $.fancybox.hideLoading();
+                             parent.jQuery.fancybox.close();*/
+                        },
+                        error : function(data, status) {
+                            alert('저장중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+//                            $.fancybox.hideLoading();
+                        }
+                    });
+
+                    return false;
+                },
+
+                rules: {
+                    'saDate' : {
+                        required : true
+                    },
+                    'saMemo' : {
+                        required : true,
+                        maxlength : 500
+                    }
+                },
+
+                messages : {
+                    'saDate' : {
+                        required : '비영업일자를 선택해 주세요.'
+                    },
+                    'saMemo' : {
+                        required : '사유를 입력해 주세요.',
+                        maxlength : "사유는 {0}자 이하로 입력해 주세요."
+                    }
+                },
+
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                errorPlacement: function(error, element) {
+                    error.addClass('message');  // add a class to the wrapper
+                    error.insertAfter(element);
+                }
+            });
+
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+
+                rules: {
+                    /*'bnOpenTm1' : {
+                        required : true,
+                        range: [1, 24]
+                    },
+                    'bnOpenTm2' : {
+                        required : true,
+                        range: [0, 60]
+                    },
+                    'bnCloseTm1' : {
+                        required : true,
+                        range: [1, 24]
+                    },
+                    'bnCloseTm2' : {
+                        required : true,
+                        range: [0, 60]
+                    },*/
+                    'bnOpenTm0' : {
+                        required : true
+                    },
+                    'bnCloseTm0' : {
+                        required : true
+                    },
+                    'bnTransTm' : {
+                        required : true,
+                        number : true
+                    },
+                    'bnDeliTm' : {
+                        required : true,
+                        number : true
+                    },
+                    'bnMonTo' : {
+                        number : true
+                    },
+                    'bnTueTo' : {
+                        number : true
+                    },
+                    'bnWedTo' : {
+                        number : true
+                    },
+                    'bnThuTo' : {
+                        number : true
+                    },
+                    'bnFriTo' : {
+                        number : true
+                    },
+                    'bnSatTo' : {
+                        number : true
+                    },
+                    'bnSunTo' : {
+                        number : true
+                    }
+                },
+
+                messages : {
+                    /*'bnOpenTm1' : {
+                        required : '영업시작 시간을 입력해 주세요.',
+                        range : "영업시작 시간은 {0}과 {1}사이의 숫자로 입력해 주세요."
+                    },
+                    'bnOpenTm2' : {
+                        required : '영업시작 분을 입력해 주세요.',
+                        range : "영업시작 분은 {0}과 {1}사이의 숫자로 입력해 주세요."
+                    },
+                    'bnCloseTm1' : {
+                        required : '영업종료 시간을 입력해 주세요.',
+                        range : "영업종료 시간은 {0}과 {1}사이의 숫자로 입력해 주세요."
+                    },
+                    'bnCloseTm2' : {
+                        required : '영업종료 분을 입력해 주세요.',
+                        range : "영업종료 분은 {0}과 {1}사이의 숫자로 입력해 주세요."
+                    },*/
+                    'bnOpenTm0' : {
+                        required : '영업시작 시간을 선택해 주세요.'
+                    },
+                    'bnCloseTm0' : {
+                        required : '영업종료 시간을 선택해 주세요.'
+                    },
+                    'bnTransTm' : {
+                        required : '수거시간간격을 입력해 주세요.',
+                        number : "수거시간간격은 숫자만 입력해 주세요."
+                    },
+                    'bnDeliTm' : {
+                        required : '배송시간간격을 입력해 주세요.',
+                        number : "배송시간간격은 숫자만 입력해 주세요."
+                    },
+                        'bnMonTo' : {
+                                number : '월요일 수거TO는 숫자만 입력해 주세요'
+                                },
+                        'bnTueTo' : {
+                                number : true
+                                },
+                        'bnWedTo' : {
+                                number : true
+                                },
+                        'bnThuTo' : {
+                                number : true
+                                },
+                        'bnFriTo' : {
+                                number : true
+                                },
+                        'bnSatTo' : {
+                                number : true
+                                },
+                        'bnSunTo' : {
+                                number : true
+                                }
+                },
+
+                /*groups: {
+                 'code': 'cdGp cdIt'
+                 },*/
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                errorPlacement: function(error, element) {
+                    error.addClass('message');  // add a class to the wrapper
+
+                    /*if (element.attr('name') == 'mgDt') {
+                     error.insertAfter('.input-group.date');
+                     } else {*/
+                    error.insertAfter(element);
+//                        }
+                }
+            });
+
+//        신규일때만 중복체크
+            /*if($('#regfrm > #mode').val() == 'new') {
+
+                $.each( $( '#pdLvl1, #pdLvl2, #pdLvl3' ), function() {
+//                    alert($(this).attr('id'));
+                    $(this).rules('add', {
+                        remote: {
+                            url: "/branch/check-code",
+                            type: "get",
+                            data: {
+                                pdLvl1: function() {
+                                    return $( '#pdLvl1' ).val();
+                                },
+                                pdLvl2: function() {
+                                    return $( '#pdLvl2' ).val();
+                                },
+                                pdLvl3: function() {
+                                    return $( '#pdLvl3' ).val();
+                                }
+                            }
+                        },
+                        messages: {
+                            remote : '이미 존재하는 상위/중위/하위코드 조합입니다!'
+                        }
+                    });
+                });
+
+            }*/
+
+        });
+
+        (function() {
+
+            var db = {
+
+                loadData: function(filter) {
+                    var d = $.Deferred();
+                    filter.bnCd = $('#regfrm #bnCd').val();
+
+                    $.ajax({
+                        url: '/salesinfo/list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+                        d.resolve(response.content);
+                    });
+
+                    return d.promise();
+                }
+
+            };
+
+            window.db = db;
+        }());
+
+//        비영업일 리스트 그리드 검색
+        function fnSearch2() {
+            $('#jsGrid').jsGrid('search');
+        }
+
+//        비영업일 신규 처리
+        function fnNew() {
+            $('#regfrm2 #id').val(null);
+            $('#regfrm2 #bnCd').val($('#regfrm #bnCd').val());
+            $('#regfrm2 #mode').val('new');
+            $('#regfrm2 #regiDt').val(null);
+            $('#regfrm2 #saDate').val(null);
+            $('#regfrm2 #saMemo').val(null);
+        }
+    </script>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <form th:object="${branch}" th:action="@{/manage/business_hours/saveBhours}" method="post" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{bnCd}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+
+        <div class="search_area">
+            <h2 class="page_title">
+                영업시간 정보
+                <a class="yell_btn" href="/manage/business_hours/list">닫기</a>
+                <a class="yell_btn" id="btnDelete" th:if="${branch.mode != 'new'}">삭제</a>
+                <a class="yell_btn" id="btnSave">저장</a>
+            </h2>
+            <div class="input_area">
+                <div class="col">
+                    <label>지점명</label>
+                    <input type="text" class="popup_input" maxlength="50" th:field="*{bnNm}" readonly="readonly" />
+                </div>
+                <!--<div class="col harf">
+                    <label>지점장</label>
+                    <input type="text" class="popup_input" maxlength="20" th:field="*{bnCeo}" />
+                </div>-->
+<!--                <div class="col harf">
+                    <label>영업시작시간</label>
+                    <input type="text" class="shot_input" maxlength="20" th:field="*{bnOpenTm1}" /><span class="input_text">시</span>
+                    <input type="text" class="shot_input" maxlength="20" th:field="*{bnOpenTm2}" /><span class="input_text">분</span>
+                </div>
+                <div class="col harf">
+                    <label>영업종료시간</label>
+                    <input type="text" class="shot_input" maxlength="20" th:field="*{bnCloseTm1}" /><span class="input_text">시</span>
+                    <input type="text" class="shot_input" maxlength="20" th:field="*{bnCloseTm2}" /><span class="input_text">분</span>
+                </div>-->
+
+                <div class="col harf time">
+                    <label>영업시작시간</label>
+
+                    <div class="input-group bootstrap-timepicker timepicker">
+                        <input type="text" class="form-control input-small" th:field="*{bnOpenTm0}" />
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                    </div>
+
+                    <script type="text/javascript">
+                        //        $('#timepicker1').timepicker();
+                        $('#bnOpenTm0').timepicker({showMeridian: false, defaultTime: false});
+                    </script>
+                </div>
+                <div class="col harf time">
+                    <label>영업종료시간</label>
+
+                    <div class="input-group bootstrap-timepicker timepicker">
+                        <input type="text" class="form-control input-small" th:field="*{bnCloseTm0}" />
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                    </div>
+
+                    <script type="text/javascript">
+                        //        $('#timepicker1').timepicker();
+                        $('#bnCloseTm0').timepicker({showMeridian: false, defaultTime: false});
+                    </script>
+                </div>
+
+                <div class="col harf">
+                    <label>수거시간간격</label>
+                    <input type="text" class="shot_input" maxlength="3" th:field="*{bnTransTm}" />
+                    <span class="input_text">분</span>
+                </div>
+                <div class="col harf">
+                    <label>배송시간 간격</label>
+                    <input type="text" class="shot_input" maxlength="3" th:field="*{bnDeliTm}" />
+                    <span class="input_text">분</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search_area">
+            <h2 class="page_title">
+                영업요일
+            </h2>
+            <div class="chk_area">
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnMon}" value="Y"/><label for="bnMon">월요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnMonTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnTue}" value="Y"/><label for="bnTue">화요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnTueTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnWed}" value="Y"/><label for="bnWed">수요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnWedTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnThu}" value="Y"/><label for="bnThu">목요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnThuTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnFri}" value="Y"/><label for="bnFri">금요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnFriTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnSat}" value="Y"/><label for="bnSat">토요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnSatTo}"/>
+                </div>
+
+                <div class="chk_div">
+                    <input type="checkbox" th:field="*{bnSun}" value="Y"/><label for="bnSun">일요일</label>
+                    수거TO <input type="text" maxlength="2" th:field="*{bnSunTo}"/>
+                </div>
+
+                <div class="chk_div">
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="table_area harf">
+        <h2 class="page_title">
+            비영업일 리스트
+            <a class="add_brn" id="btnAdd"><img src="/img/add_icon.png" alt="" /></a>
+        </h2>
+        <div id="jsGrid" class="table_area"></div>
+    </div>
+
+    <div class="add_data">
+        <h2 class="page_title">
+            비영업일 정보
+            <a class="yell_btn" id="btnDelete2">삭제</a>
+            <a class="yell_btn" id="btnSave2">저장</a>
+        </h2>
+        <div class="add_data_area">
+
+<form th:object="${salesinfo}" th:action="@{/salesinfo/saveSalesInfo}" method="post" id="regfrm2" name="regfrm2">
+    <input type="hidden" th:field="*{id}"/>
+    <input type="hidden" th:field="*{bnCd}"/>
+    <input type="hidden" th:field="*{delYn}"/>
+    <input type="hidden" th:field="*{evtNm}"/>
+    <input type="hidden" th:field="*{regiDt}"/>
+    <input type="hidden" th:field="*{user}"/>
+    <input type="hidden" th:field="*{mode}"/>
+
+            <div class="col">
+                <label>비영업일자</label>
+                <!--<input type="text" class="popup_input cal" />
+                <img src="/img/calendar.png" alt="" class="calendar" />-->
+                <div class="input-group date">
+                    <input type="text" maxlength="10" class="popup_input" th:field="*{saDate}" />
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            </div>
+
+            <!--<div class="col">
+                <label>시간</label>
+                <input type="text" class="popup_input shot2" />
+                <span class="input_text2" th:field="*{saDate}">시</span>
+                <input type="text" class="popup_input shot2" />
+                <span class="input_text2" th:field="*{saDate}">분</span>
+                -
+                <input type="text" class="popup_input shot2" />
+                <span class="input_text2" th:field="*{saDate}">시</span>
+                <input type="text" class="popup_input shot2" />
+                <span class="input_text2" th:field="*{saDate}">분</span>
+            </div>-->
+
+            <div class="col">
+                <label class="long">사유</label>
+                <textarea class="popup_input" th:field="*{saMemo}"></textarea>
+            </div>
+
+</form>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

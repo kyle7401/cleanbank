@@ -1,0 +1,71 @@
+﻿/* terms */
+/*custom css*/
+dt {
+	border-top: 1px solid #e4e4e4;
+}
+dt.first {
+	border-top: 0 solid #fff;margin-top:-15px;
+}
+.wrap_contents,.agree_body {margin-top:0;}
+.agree_body td {
+	text-align: justify;
+}
+.agree_body dt {
+	font-size: 15px;
+	color: #136ebe;
+	font-weight: bold;
+	padding: 17px 15px 5px 10px;
+}
+.agree_body ol {
+	color: #555555;
+	font-weight: normal;
+	list-style-type: none;
+	margin-left: 0;
+	padding-left: 16px;
+}
+.agree_body ul {
+	list-style-position: outside;
+	list-style-type: disc;
+	padding-left: 16px;
+}
+.agree_body dd {
+	font-size: 14px;
+	margin-left: 0;
+	padding:0 15px 0 10px;
+	line-height: 1.3em;
+}
+.agree_body dd ol {
+	/*margin-left: -10px;*/
+	margin-top: 0;
+}
+
+.agree_body dd ol li {
+	padding-bottom: 5px;
+}
+
+.agree_body dd ol ol {
+	padding-top: 2px;
+	padding-bottom: 5px;
+	margin-left: 0;
+}
+
+.agree_body li ol {
+	color: #555555;
+	font-weight: normal;
+	list-style-type: none;
+	padding-left: 15px;
+}
+
+.num1 {
+	margin-left: -16px;
+}
+
+.date {
+	color: #136ebe;
+	font: bold 14px 돋움, Dotum;
+}
+	
+.t11 {
+	color: #bbb;
+	font: normal 11px 돋움, Dotum;
+}

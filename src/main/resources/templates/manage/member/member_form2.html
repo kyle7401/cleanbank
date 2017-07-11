@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>고객관리</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="/webjars//js-grid/1.2.0/dist/jsgrid.min.css" rel="stylesheet" media="screen" />
+    <link href="/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css" rel="stylesheet" media="screen" />
+    <script src="/webjars/js-grid/1.2.0/dist/jsgrid.min.js"></script>
+
+    <style>
+        .pop_input_area .col {position: relative;}
+        div.error { position: absolute; top: 15px; background-color: transparent; left: 40px;width: 290px;}
+
+        .col.harf.date span.input-group-addon { text-indent: -10000px; padding: 8px 20px;  border: none;  background-color: transparent;  background-image: url('/img/calendar.png');  background-repeat: no-repeat;  background-position: center;  position: absolute; top: 7px; right: 7px;}
+        .pop_input_area .col.harf.date input.popup_input {width: 130px;}
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            init();
+//            test();
+        });
+
+        function test() {
+            $('#mbEmail').val('mbr1');
+//            $('#mbPass').val('1111');
+            $('#mbNicNm').val('고객1');
+            $('#mbTel').val('010-1234-5678');
+        }
+
+        function init() {
+            makeDatepicker2('div.date');
+
+            $('#mbEmail').change(function() {
+                $('#mbNicNm').val($(this).val());
+            });
+
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });
+
+            $('#btnDelete').click(function () {
+//                alert( 'id '+ $('#id').val() +' 삭제!' );
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.fancybox.showLoading();
+
+                var vNo = $('#mbCd').val();
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/member/delete-member',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        //pageReload();
+                        $.fancybox.hideLoading();
+//                        $.fancybox.close();
+                        parent.jQuery.fancybox.close();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                        $.fancybox.hideLoading();
+                    }
+                });
+
+            });
+        }
+
+        $(function(){
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+
+                rules: {
+                    'mbEmail' : {
+                        required : true,
+                        minlength : 2,
+                        remote: {
+                            url: '/member/check-email',
+//                            type: "post",
+                            data: {
+                                mbCd: function() {
+                                    return $( '#mbCd' ).val();
+                                }
+                            }
+                        }
+                    },
+/*                    'mbPass' : {
+                        required : true,
+                        minlength : 2
+                    },*/
+                    'mbNicNm' : {
+                        required : true
+                    },
+                    'mbTel' : {
+                        required : true,
+                        remote: {
+                            url: '/member/check-tel',
+//                            type: "post",
+                            data: {
+                                mbCd: function() {
+                                    return $( '#mbCd' ).val();
+                                }
+                            }
+                        }
+                    }
+                },
+
+                messages : {
+                    'mbEmail' : {
+                        required : "아이디를 입력해 주세요.",
+                        minlength : "아이디는 {0}글자 이상 입력해 주세요.",
+                        remote: '이미 사용중인 아이디 입니다!'
+                    },
+/*                    'mbPass' : {
+                        required : "암호를 입력해 주세요.",
+                        minlength : "암호는 {0}글자 이상 입력해 주세요."
+                    },*/
+                    'mbNicNm' : {
+                        required : "닉네임을 입력해 주세요."
+                    },
+                    'mbTel' : {
+                        required : "연락처를 입력해 주세요.",
+                        remote: '이미 사용중인 연락처 입니다!'
+                    }
+                },
+
+                /*groups: {
+                    'member': 'cdGp cdIt'
+                },*/
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        /*if (element.attr('name') == 'mgDt') {
+                            error.insertAfter('.input-group.date');
+                        } else {*/
+                            error.insertAfter(element);
+//                        }
+                    }
+            });
+
+//        신규일때만 중복체크
+/*            if($('#regfrm > #mode').val() == 'new') {
+
+                $('#cdGp').rules('add', {
+                    remote: {
+                        url: "/member/check-member",
+                        type: "get",
+                        data: {
+                            cdGp: function() {
+                                return $( '#cdGp' ).val();
+                            },
+                            cdIt: function() {
+                                return $( '#cdIt' ).val();
+                            }
+                        }
+                    },
+                    messages: {
+                        remote : '이미 존재하는 상위고객정보와 하위고객정보 조합입니다!'
+                    }
+                });
+
+                $('#cdIt').rules('add', {
+                    remote: {
+                        url: "/member/check-member",
+                        type: "get",
+                        data: {
+                            cdGp: function() {
+                                return $( '#cdGp' ).val();
+                            },
+                            cdIt: function() {
+                                return $( '#cdIt' ).val();
+                            }
+                        }
+                    },
+                    messages: {
+                        remote : '이미 존재하는 상위고객정보와 하위고객정보 조합입니다!'
+                    }
+                });
+
+            }*/
+
+        });
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+                width: '100%',
+                height: 'auto',
+                paging: true,
+                pageSize: 5,
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+                heading: false,
+
+                rowClick: function (args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    {name: 'mbAddr', title: '주소', type: 'text', align: 'left'}
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+//                fnOpenFancybox('/manage/code/'+ client.id);
+//                console.log('client.mbCd = '+ client.mbCd +' , client.id = '+ client.id);
+                window.location.href = '/manage/member/address2/'+ client.mbCd +'/'+ client.id;
+            };
+        });
+
+        //    http://warmz.tistory.com/739
+        (function() {
+            var db = {
+
+                loadData: function(filter) {
+                    var d = $.Deferred();
+
+                    filter.mbCd = $('#regfrm #mbCd').val();
+//                    alert(filter.mbCd);
+
+                    $.ajax({
+                        url: '/member/listAddress',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+                        d.resolve(response.content);
+//                        d.resolve(response);
+                    });
+
+                    return d.promise();
+                }
+            };
+
+            window.db = db;
+        }());
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content">
+
+    <form th:object="${member}" th:action="@{/manage/member/saveMember}" method="post" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{mbCd}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+
+    <h2 class="page_title pop">고객주소관리</h2>
+
+        <div class="pop_input_area codi">
+            <div class="col harf">
+                <label>아이디</label><!-- th:readonly="${member.mode != 'new'}"-->
+                <input type="text" maxlength="50" class="popup_input" th:field="*{mbEmail}" readonly="readonly"/>
+
+            </div>
+
+            <div class="col harf">
+                <label>닉네임</label>
+                <input type="text" maxlength="100" class="popup_input" th:field="*{mbNicNm}" readonly="readonly"/>
+            </div>
+        </div>
+
+        <div class="address_book" th:if="${member.mode != 'new'}">
+            <h3>최근주소록</h3>
+            <a href="주소" th:href="@{/manage/member/address2/{mbrId}(mbrId=${member.mbCd})}">주소추가</a>
+
+            <div id="jsGrid" class="table_area"></div>
+
+<!--            <ul>
+                <li>서울특별시 서대문구 연희동 170-130 3층 301호</li>
+            </ul>-->
+        </div>
+
+        <div class="btn_group">
+            <!--<a class="close_btn" id="btnSave">저장</a>
+            <a class="close_btn" id="btnDelete" th:if="${member.mode != 'new'}">삭제</a>-->
+            <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

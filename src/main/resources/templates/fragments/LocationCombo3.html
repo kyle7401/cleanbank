@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<select th:fragment="resultsList">
+    <!--<option th:text="#{select_item}">Select item...</option>-->
+    <option value=""></option>
+    <option th:each="item : ${itemList}" th:value="${item.loc3}" th:text="${item.name}">My item</option>
+</select>
+
+</body>
+</html>

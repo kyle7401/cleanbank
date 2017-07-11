@@ -1,0 +1,66 @@
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: cleanbank
+-- ------------------------------------------------------
+-- Server version	5.5.47-0+deb7u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `TB_PICTURE`
+--
+
+DROP TABLE IF EXISTS `TB_PICTURE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `TB_PICTURE` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `DEL_YN` varchar(1) DEFAULT NULL COMMENT '삭제여부',
+  `EVT_NM` varchar(30) DEFAULT NULL COMMENT '이벤트명',
+  `IT_CD` bigint(20) NOT NULL COMMENT '주문상세코드',
+  `OR_CD` bigint(20) NOT NULL COMMENT '주문코드',
+  `PT_CD` bigint(20) NOT NULL COMMENT '사진코드',
+  `PT_IMG_FILE` varchar(200) DEFAULT NULL COMMENT '이미지파일정보',
+  `REGI_DT` datetime DEFAULT NULL COMMENT '작성일자',
+  `USER` varchar(20) DEFAULT NULL COMMENT '작성자',
+  `contentType` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT NULL,
+  `lastUpdated` datetime DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `newFilename` varchar(255) DEFAULT NULL,
+  `size` bigint(20) DEFAULT NULL,
+  `thumbnailFilename` varchar(255) DEFAULT NULL,
+  `thumbnailSize` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='사진정보';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `TB_PICTURE`
+--
+
+LOCK TABLES `TB_PICTURE` WRITE;
+/*!40000 ALTER TABLE `TB_PICTURE` DISABLE KEYS */;
+INSERT INTO `TB_PICTURE` VALUES (1,NULL,NULL,680,512,0,NULL,NULL,NULL,'application/octet-stream',NULL,NULL,'backmin_1458889762533.jpg','7bc8297a-612a-4d4c-a589-20f3c3daa535.jpg',1988714,'7bc8297a-612a-4d4c-a589-20f3c3daa535-thumbnail.png',12142),(2,NULL,NULL,685,515,0,NULL,NULL,NULL,'application/octet-stream',NULL,NULL,'backmin_1459079394060.jpg','f4ba5a08-5004-4b57-9885-dc11ad109f40.jpg',2632650,'f4ba5a08-5004-4b57-9885-dc11ad109f40-thumbnail.png',9152),(3,NULL,NULL,685,515,0,NULL,NULL,NULL,'application/octet-stream',NULL,NULL,'backmin_1459079428922.jpg','c3769e57-37e4-4ecc-80f0-9bcf4cee12ca.jpg',2102894,'c3769e57-37e4-4ecc-80f0-9bcf4cee12ca-thumbnail.png',8260),(4,NULL,NULL,693,517,0,NULL,NULL,NULL,'application/octet-stream',NULL,NULL,'backmin_1459090741324.jpg','62a2eabc-aa2b-42e8-8f08-37d012996c31.jpg',2080432,'62a2eabc-aa2b-42e8-8f08-37d012996c31-thumbnail.png',9126),(5,NULL,NULL,693,517,0,NULL,NULL,NULL,'application/octet-stream',NULL,NULL,'backmin_1459090756072.jpg','763ccdd8-c7e2-4548-89e9-79e618ac03b6.jpg',1656432,'763ccdd8-c7e2-4548-89e9-79e618ac03b6-thumbnail.png',5402);
+/*!40000 ALTER TABLE `TB_PICTURE` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-03-28 15:59:41

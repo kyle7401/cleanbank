@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>관리자계정관리</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <style>
+        .pop_input_area .col {position: relative;}
+        div.error { position: absolute; top: 15px; background-color: transparent; left: 40px;width: 290px;}
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            init();
+//            test();
+        });
+
+        function test() {
+            $('#mgEmail').val('hyoseop@synapsetech.co.kr');
+            $('#mgPass').val('1111');
+            $('#mgNm').val('송효섭');
+            $('#mgDt').val('2015-11-10');
+            $('#regiDt').val('2015-11-23');
+        }
+
+        function init() {
+            makeDatepicker('.pop_input_area .input-group.date');
+
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+//                parent.$.fancybox.update();
+            });
+
+            $('#btnDelete').click(function () {
+//                alert( 'id '+ $('#id').val() +' 삭제!' );
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.fancybox.showLoading();
+
+                var vNo = $('#id').val();
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/manage/manager/delete-user',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        //pageReload();
+                        $.fancybox.hideLoading();
+//                        $.fancybox.close();
+                        parent.jQuery.fancybox.close();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                        $.fancybox.hideLoading();
+                    }
+                });
+
+            });
+        }
+
+        $(function(){
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+
+                rules: {
+                    'mgEmail' : {
+                        required : true,
+                        minlength : 4
+                    },
+                    'mgPass' : {
+                        required : true,
+                        minlength : 4
+                    },
+                    'newPass' : {
+                        minlength : 4
+                    },
+                    'mgNm' : {
+                        required : true,
+                        minlength : 2
+                    },
+                    'mgType' : {
+                        required : true
+                    },
+                    'mgDt' : {
+                        required : true
+//                        minlength : 8
+                    },
+                    'bnCd' : {
+                        required : true
+                    }
+                },
+
+                messages : {
+                    'mgEmail' : {
+                        required : "아이디를 입력해 주세요.",
+                        minlength : "아이디는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'mgPass' : {
+                        required : "암호를 입력해 주세요.",
+                        minlength : "암호는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'newPass' : {
+                        minlength : "암호는 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'mgNm' : {
+                        required : "성명을 입력해 주세요.",
+                        minlength : "성명은 최소 {0}글자 이상 입력해 주세요."
+                    },
+                    'mgType' : {
+                        required : "관리유형을 선택해 주세요."
+                    },
+                    'mgDt' : {
+                        required : "가입일자를 선택해 주세요."
+                    },
+                    'bnCd' : {
+                        required : "지점을 선택해 주세요."
+                    }
+                },
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        if (element.attr('name') == 'mgDt') {
+                            error.insertAfter('.input-group.date');
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+            });
+
+//        신규일때만 email 중복체크
+            if($('#regfrm > #mode').val() == 'new') {
+
+                $('#mgEmail').rules('add', {
+                    remote: "/manage/manager/check-email",
+                    messages: {
+                        remote: "이미 사용중인 email 주소 입니다!"
+                    }
+                });
+
+            }
+
+        });
+        /*$('#tbContent\\.ctDeliveDate, #tbContent\\.ctOpenDate').datepicker({
+            format: "yyyy-mm-dd",
+            startDate: "-0d",
+            language: "ko",
+            autoclose: true,
+            todayHighlight: true
+        });*/
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content" style="width:460px;height:400px">
+
+    <form th:object="${manager}" th:action="@{/manage/manager/saveManager}" method="post" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+        <input type="hidden" th:field="*{mgPass}" th:if="${manager.mode != 'new'}"/>
+
+    <h2 class="page_title pop">관리자정보</h2>
+    <div class="pop_input_area">
+        <div class="col">
+            <label>아이디</label>
+            <!--<input type="text" class="popup_input" />-->
+            <input type="text" maxlength="50" class="popup_input" th:field="*{mgEmail}" th:readonly="${manager.mode != 'new'}" />
+        </div>
+
+        <div class="col" th:if="${manager.mode == 'new'}">
+            <label>암호</label>
+            <input type="password" maxlength="20" class="popup_input" th:field="*{mgPass}" />
+        </div>
+
+        <div class="col" th:if="${manager.mode != 'new'}">
+            <label>암호변경</label>
+            <input type="password" maxlength="20" class="popup_input" th:field="*{newPass}" />
+        </div>
+
+        <div class="col">
+            <label>이름</label>
+            <input type="text" maxlength="20" class="popup_input" th:field="*{mgNm}" />
+        </div>
+
+        <div class="col">
+            <label>연락처</label>
+            <input type="text" maxlength="20" class="popup_input" th:field="*{mgTel}" />
+        </div>
+
+        <div class="col">
+            <label>지점</label>
+            <select th:field="*{bnCd}">
+                <option th:each="cd : ${branch_cds}"
+                        th:value="${cd[0]}"
+                        th:text="${cd[1]}">text</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <label>관리유형</label>
+            <select th:field="*{mgType}">
+                <option value="0001">본사 관리자</option>
+                <option value="0002">지점장</option>
+            </select>
+        </div>
+        <div class="col">
+            <label>가입일자</label>
+            <!--<input type="text" class="popup_input cal" th:field="*{mgDt}" />
+            <img src="/img/calendar.png" alt=""  class="calendar" />-->
+
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{mgDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+
+        </div>
+    </div>
+    <div class="btn_group">
+        <a class="close_btn" id="btnSave">저장</a>
+        <a class="close_btn" id="btnDelete" th:if="${manager.mode != 'new'}">삭제</a>
+        <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+    </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

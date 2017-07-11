@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>코드관리</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <style>
+        .pop_input_area .col {position: relative;}
+        div.error { position: absolute; top: 15px; background-color: transparent; left: 40px;width: 290px;}
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            init();
+//            test();
+        });
+
+        function test() {
+            $('#cdGp').val('01');
+            $('#cdIt').val('01');
+            $('#cdNm').val('테스트코드 #1');
+            $('#cdSort').val('1');
+        }
+
+        function init() {
+            $('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });
+
+            $('#btnDelete').click(function () {
+//                alert( 'id '+ $('#id').val() +' 삭제!' );
+
+                if(!confirm("삭제 하시겠습니까?")) return false;
+
+                $.fancybox.showLoading();
+
+                var vNo = $('#id').val();
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/code/delete-code',
+                    data : {no: vNo},
+                    //mimeType: 'multipart/form-data',
+                    success : function(data, status) {
+                        alert("삭제 하였습니다!");
+                        //pageReload();
+                        $.fancybox.hideLoading();
+//                        $.fancybox.close();
+                        parent.jQuery.fancybox.close();
+                    },
+                    error : function(data, status) {
+                        alert('삭제중 에러가 발생하였습니다.');
+//                        console.log('실패 '+ data);
+                        $.fancybox.hideLoading();
+                    }
+                });
+
+            });
+        }
+
+        $(function(){
+            $("#regfrm").validate({
+                submitHandler: function() {
+                    var f = confirm("저장 하시겠습니까?");
+                    if(f){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+
+                rules: {
+                    'cdGp' : {
+                        required : true,
+                        minlength : 2
+                    },
+                    'cdIt' : {
+                        required : true,
+                        minlength : 2
+                    },
+                    'cdNm' : {
+                        required : 2
+                    },
+                    'cdSort' : {
+                        number : true
+                    }
+                },
+
+                messages : {
+                    'cdGp' : {
+                        required : "상위코드를 입력해 주세요.",
+                        minlength : "상위코드는 {0}글자를 입력해 주세요."
+                    },
+                    'cdIt' : {
+                        required : "하위코드를 입력해 주세요.",
+                        minlength : "하위코드는 {0}글자를 입력해 주세요."
+                    },
+                    'cdNm' : {
+                        required : "코드명을 입력해 주세요."
+                    },
+                    'cdSort' : {
+                        number : "정렬순서는 숫자만 입력해 주세요."
+                    }
+                },
+
+                /*groups: {
+                    'code': 'cdGp cdIt'
+                },*/
+
+                /* http://jqueryvalidation.org/validate/ */
+                errorElement: "div",
+                wrapper: "div",  // a wrapper around the error message
+                    errorPlacement: function(error, element) {
+                        error.addClass('message');  // add a class to the wrapper
+
+                        /*if (element.attr('name') == 'mgDt') {
+                            error.insertAfter('.input-group.date');
+                        } else {*/
+                            error.insertAfter(element);
+//                        }
+                    }
+            });
+
+//        신규일때만 중복체크
+            if($('#regfrm > #mode').val() == 'new') {
+
+                $('#cdGp').rules('add', {
+                    remote: {
+                        url: "/code/check-code",
+                        type: "get",
+                        data: {
+                            cdGp: function() {
+                                return $( '#cdGp' ).val();
+                            },
+                            cdIt: function() {
+                                return $( '#cdIt' ).val();
+                            }
+                        }
+                    },
+                    messages: {
+                        remote : '이미 존재하는 상위코드와 하위코드 조합입니다!'
+                    }
+                });
+
+                $('#cdIt').rules('add', {
+                    remote: {
+                        url: "/code/check-code",
+                        type: "get",
+                        data: {
+                            cdGp: function() {
+                                return $( '#cdGp' ).val();
+                            },
+                            cdIt: function() {
+                                return $( '#cdIt' ).val();
+                            }
+                        }
+                    },
+                    messages: {
+                        remote : '이미 존재하는 상위코드와 하위코드 조합입니다!'
+                    }
+                });
+
+            }
+
+        });
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content">
+
+    <form th:object="${code}" th:action="@{/manage/code/saveCode}" method="post" id="regfrm" name="regfrm">
+
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+
+    <h2 class="page_title pop">코드정보관리</h2>
+    <div class="pop_input_area">
+        <div class="col">
+            <label>상위코드</label>
+            <input type="text" maxlength="2" class="popup_input" th:field="*{cdGp}" th:readonly="${code.mode != 'new'}" />
+        </div>
+
+        <div class="col">
+            <label>하위코드</label>
+            <input type="text" maxlength="2" class="popup_input" th:field="*{cdIt}" th:readonly="${code.mode != 'new'}" />
+        </div>
+
+        <div class="col">
+            <label>코드명</label>
+            <input type="text" maxlength="20" class="popup_input" th:field="*{cdNm}" />
+        </div>
+
+        <div class="col">
+            <label>정렬순서</label>
+            <input type="text" maxlength="2" class="popup_input" th:field="*{cdSort}" />
+        </div>
+
+    </div>
+    <div class="btn_group">
+        <a class="close_btn" id="btnSave">저장</a>
+        <a class="close_btn" id="btnDelete" th:if="${code.mode != 'new'}">삭제</a>
+        <a class="close_btn" href="javascript:parent.jQuery.fancybox.close();">닫기</a>
+    </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

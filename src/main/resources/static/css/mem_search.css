@@ -1,0 +1,4 @@
+﻿.mem_search {padding-top: 10px;padding-left: 10px; border-top: 2px solid #12b9ee }
+.mem_search select {padding: 6px;background-color: #FFFFFF; border:none; border-bottom: 1px solid #e5e5e5; width: 100px;  font-size: 10pt;}
+.mem_search input[type=text] {padding: 7px; background-color: #FFFFFF; border:none; border-bottom: 1px solid #e5e5e5; width: 150px; font-size: 10pt;}
+.mem_search button { min-width: 80px; background-color: #fff; padding: 8px 10px;border-radius: 5px;text-align: center; margin-left: 3px;color: #12b9ee;font-size: 10pt; display: inline-block; cursor: pointer; border: 2px solid #12b9ee}

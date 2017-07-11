@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>검수처리</title>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+        var selectedItems = [];
+
+        $(document).ready(function(){
+            init();
+        });
+
+        function init() {
+//            http://eternicode.github.io/bootstrap-datepicker/?markup=input&format=&weekStart=&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=2&todayBtn=false&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&keyboardNavigation=on&forceParse=on#sandbox
+            makeDatepicker2('#dtFrom, #dtTo');
+
+//          엑셀
+            $('#btnExcel').click(function () {
+                var vBnCd = $('#cmbBnCd').val();
+                var vFrom = $('#dtFrom').val();
+                var vTo = $('#dtTo').val();
+                var vKeyword = $('#txtKeyword').val();
+//                var vBnCd = $('#cmbBnCd').val();
+                var vCondition = $('#cmbCondition').val();
+                var vStatus = $('#cmbStatus').val();
+
+                window.location.href = '/accept/order/excel?bncd='+ vBnCd +'&from='+ vFrom +'&to='+ vTo +'&keyword='+ vKeyword +'&condition='+ vCondition +'&status='+ vStatus;
+            });
+
+//            주
+            $('#btnWeek').click(function () {
+                $('#dtFrom').val([[${week_from}]]);
+                $('#dtTo').val([[${dt_today}]]);
+            });
+
+//            월
+            $('#btnMonth').click(function () {
+                $('#dtFrom').val([[${month_from}]]);
+                $('#dtTo').val([[${dt_today}]]);
+            });
+
+//            등록
+            $('#btnRegister').click(function () {
+                window.location.href = '/accept/order/new';
+            });
+
+//            수정
+
+//            검색
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+
+//            $('#grid').jsGrid('refresh');
+        }
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+//                sorting: true,
+                width: '100%',
+//                filtering: true,
+
+//                height: '90%',
+                height: 'auto',
+
+                paging: true,
+                pageSize: [[${@environment.getProperty('js-grid.pageSize')}]],
+//                pagerFormat: 'Pages: {first} {prev} {pages} {next} {last}    {pageIndex} of {pageCount}',
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function(args) {
+//                    debugger;
+//                    console.log('itemIndex = '+ args.itemIndex)
+                    showDetailsDialog('Edit', args.item);
+                },
+
+//                data: db.clients,
+                autoload: true,
+                controller: db,
+
+                fields: [
+//                    http://js-grid.com/demos/batch-delete.html
+                    {
+                        headerTemplate: function() {
+                            return $("<input id='checkAll'>").attr("type", "checkbox")/*.text("Delete")*/
+                                    .on("click", function () {
+//                                        deleteSelectedItems();
+                                        var $cb = $(this);
+//                                        console.log($cb.attr("id") +' @ '+ $cb.is(":checked"));
+                                        $("input[type=checkbox]").prop("checked", $cb.is(":checked"));
+                                        $("input[type=checkbox]").trigger( 'change' );
+//                                        $("#jsGrid").jsGrid("option", $cb.attr("id"), $cb.is(":checked"));
+                                    });
+                        },
+                        itemTemplate: function(_, item) {
+                            return $("<input>").attr("type", "checkbox")
+                                    .on("change", function (e) {
+                                        $(this).is(":checked") ? selectItem(item) : unselectItem(item);
+//                                        console.log('checkbox change!!!');
+//                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    })
+                                    .on("click", function (e) {
+//                                        console.log('checkbox click!!!');
+//                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    });
+                        },
+                        align: "center",
+                        width: 30
+                    },
+
+//                    { name: '', title: '<input type="checkbox" id="chkAll" />', type: 'checkbox', align: 'center', width : '30'},
+
+//                    { name: 'IT_VISIT_DT', title: '수거완료일시', type: 'text', align: 'center'},
+                    { name: 'OR_VISIT_DT', title: '수거완료일시', type: 'text', align: 'center'},
+
+//                    { name: 'IT_REGI_DT', title: '주문일시', type: 'text', align: 'center'},
+
+//                    { name: 'OR_CD2', title: '주문번호', type: 'text', align: 'center'},
+                    { name: 'OR_CD3', title: '주문번호', type: 'text', align: 'center'},
+
+//                    { name: 'ORDER_NUMBER', title: '주문번호', type: 'text', align: 'center'},
+                    { name: 'BN_NM', title: '지점', type: 'text', align: 'center'},
+                    { name: 'MB_NIC_NM', title: '닉네임', type: 'text', align: 'center'},
+                    { name: 'MB_TEL', title: '연락처', type: 'text', align: 'center'},
+
+//                    { name: 'IT_REQ_ADDR', title: '주소', type: 'text', align: 'center'},
+                    { name: 'MB_ADDR1', title: '주소', type: 'text', align: 'center'},
+
+                    { name: 'IT_CNT', title: '개수', type: 'text', align: 'center'},
+                    { name: 'EP_CD', title: '수거크린매니저', type: 'text', align: 'center'},
+
+//                    { name: 'IT_MEMO', title: '주문비고', type: 'text', align: 'center'},
+                    { name: 'OR_MEMO', title: '주문비고', type: 'text', align: 'center'},
+
+                    { name: 'IT_STATUS', title: '주문상태', type: 'text', align: 'center'}
+                    /*{ name: 'PD_LVL', title: '상품명', type: 'text', align: 'center'},
+                    { name: '', title: '배송크린매니저', type: 'text', align: 'center'},
+                    { name: 'OR_PRICE', title: '접수금액', type: 'text', align: 'center'},
+                    { name: 'IT_STATUS', title: '주문상태', type: 'text', align: 'center'},
+                    { name: 'IT_TAC', title: '택번호', type: 'text', align: 'center'},*/
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+                window.location.href = '/accept/order/'+ client.orCd;
+            };
+
+//            var selectedItems = [];
+
+            var selectItem = function(item) {
+//                push 전에 중복여부 확인 필요
+                if($.inArray( item, selectedItems ) != -1) {
+//                    console.log('중복됨 : '+ $.inArray( item, selectedItems ));
+                } else {
+//                    console.log('추가됨');
+                    selectedItems.push(item);
+                }
+
+            };
+
+            var unselectItem = function(item) {
+                selectedItems = $.grep(selectedItems, function(i) {
+                    return i !== item;
+                });
+            };
+
+            var deleteSelectedItems = function() {
+                if(!selectedItems.length || !confirm("Are you sure?"))
+                    return;
+
+                var $grid = $("#jsGrid");
+
+                $.each(selectedItems, function(_, item) {
+                    $grid.jsGrid("deleteItem", item);
+                });
+
+                selectedItems = [];
+            };
+
+            //            검수완료
+            $('#btnChangeSt').click(function () {
+                fnChangeSt();
+            });
+
+            var fnChangeSt = function() {
+                if(!selectedItems.length) {
+                    alert('검수완료 처리할 데이터를 선택해 주세요!')
+                    return;
+                }
+
+                if(!confirm(selectedItems.length +'건의 데이터를 검수완료 처리 하시겠습니까?')) {
+                    return;
+                }
+
+                ids = [];
+
+                $.each(selectedItems, function(_, item) {
+                    /*console.log(''+ item.ID);
+                    ids.push(item.ID);*/
+                    console.log(''+ item.orCd);
+                    ids.push(item.orCd);
+                });
+
+                $.ajax({
+                    type : "POST",
+                    cache : false,
+                    url : '/order/changeSt',
+                    data : { items: ids },
+                    traditional: true,
+                    success : function(data, status) {
+                        alert('검수완료 처리 하였습니다!');
+                        fnSearch();
+                    },
+                    error : function(data, status) {
+                        alert('검수완료 처리중 에러가 발생하였습니다.');
+                        console.log('실패 '+ data);
+                    }
+                });
+
+            };
+        });
+
+/*    function fnChangeSt() {
+        if(!selectedItems.length) {
+            alert('검수완료 처리할 데이터를 선택해 주세요!')
+            return;
+        }
+
+        if(!confirm(selectedItems.length +'건의 데이터를 검수완료 처리 하시겠습니까?')) {
+            return;
+        }
+    }*/
+
+        (function() {
+
+            var db = {
+
+                loadData: function(filter) {
+                    var d = $.Deferred();
+
+//                    초기 검색조건 : 주문상태 콤보
+                    filter.status = $('#cmbStatus').val();
+                    filter.bncd = $('#cmbBnCd').val();
+
+                    $.ajax({
+                        url: '/order/list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+//                        d.resolve(response.content);
+                        d.resolve(response);
+                    });
+
+                    return d.promise();
+                }
+
+            };
+
+            window.db = db;
+        }());
+
+        function fnSearch() {
+            var vBnCd = $('#cmbBnCd').val();
+            var vFrom = $('#dtFrom').val();
+            var vTo = $('#dtTo').val();
+            var vKeyword = $('#txtKeyword').val();
+//            var vBnCd = $('#cmbBnCd').val();
+            var vCondition = $('#cmbCondition').val();
+            var vStatus = $('#cmbStatus').val();
+//alert(vStatus);
+            $('#jsGrid').jsGrid('search', { bncd: vBnCd, from: vFrom, to: vTo, keyword: vKeyword, condition: vCondition, status: vStatus });
+
+            selectedItems = [];
+            $('#checkAll').prop("checked", false);
+        }
+    /*]]>*/
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+    <div class="search_area">
+        <h2 class="page_title">
+            검수처리
+            <a class="yell_btn" id="btnExcel">엑셀</a>
+            <!--<a class="yell_btn" id="btnRegister">주문작성</a>-->
+            <a class="yell_btn" id="btnChangeSt" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">검수완료</a>
+            <a class="yell_btn" id="btnSearch">조회</a>
+        </h2>
+        <div class="search_input">
+            <label class="front">지점</label>
+            <select class="front" id="cmbBnCd">
+                <option value="" th:if="${#arrays.length(branch_cds)} &gt; 1">전체</option>
+                <option th:each="cd : ${branch_cds}"
+                        th:value="${cd[0]}"
+                        th:text="${cd[1]}">text</option>
+            </select>
+
+            <label>주문기간</label>
+            <input type="text" class="term" id="dtFrom" /> - <input type="text" class="term" id="dtTo" />
+            <a class="week_b" id="btnWeek">주</a>
+            <a class="month_b" id="btnMonth">월</a>
+
+            <select id="cmbCondition">
+                <option value="N">닉네임</option>
+                <option value="T">전화번호</option>
+            </select>
+            <input type="text" class="default" id="txtKeyword" />
+
+            <label>주문상태</label>
+            <select class="front" id="cmbStatus">
+                <option value="">전체</option>
+                <!--<option th:each="cd : ${cmb_status}"
+                        th:value="${cd.cdGp} +''+ ${cd.cdIt}"
+                        th:text="${cd.cdNm}">text</option>-->
+                <!--th:selected="${cd.cdIt == '01'}"-->
+                <option value="0103" selected="selected">수거완료</option>
+                <option value="0104">검수완료</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="jsGrid" class="table_area"></div>
+</div>
+
+</body>
+</html>

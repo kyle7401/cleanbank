@@ -1,0 +1,237 @@
+﻿
+/*css 초기화*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Helvetica, 'Trebuchet MS', Tahoma, sans-serif;
+  font-size: 62.5%;
+  line-height: 1;
+  color: #414141;
+  background: #fefefe;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: "맑은 고딕";
+}
+br { display: block; line-height: 1.6em; } 
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
+ol, ul { list-style: none; }
+
+input, textarea { 
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  outline: none; 
+}
+
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+strong, b { font-weight: bold; }
+em, i { font-style: italic; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+img { border: 0; /* max-width: 100%; */ /* height: auto; */ /* width: 100%; */ }
+a:hover{text-decoration:none}
+
+/*=================================================================  여기서부터 본문내용  =================================================================================*/
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+*{ font-family: "맑은 고딕"}
+body {font-family: '나눔고딕', 'Nanum Gothic', sans-serif;}
+.pop_b{ background-color: #fff}
+
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "맑은 고딕";  
+    }	
+body .top_area { height: 80px;margin-bottom: -80px;z-index: 8000;width: 100%;top: 0;}
+
+
+.top {background-color: #fff;}
+.center {width: 1250px; margin: auto; font-size: 10pt;/*overflow: hidden;*/padding: 7px 0;}
+.top .center {
+    height: 85px;
+}
+.top.admin .logo { padding: 0;}
+.user {float: right;color: #000;font-size: 11pt;vertical-align: middle;margin-top: 10px;/* min-width: 150px; */right: 0;position:relative;max-width: 400px;/* width: 400px; */}
+.user a {/* height: 100%; */display: block;float: right;padding-top: 10px;margin-left: 0;font-size: 10pt;color: #12b9ee;vertical-align: middle;/* line-height: 300%; */ z-index: 8002;  position: absolute; right: 12px;top: 5px;    min-width: 100px; }
+.user span { display: block;float: left;     padding-top: 10px;min-width: 100px;padding-left: 10px;text-overflow: ellipsis;      overflow: hidden;      white-space: nowrap;max-width: 150px;position: absolute; right: 122px;top: 5px; }
+.user a img { vertical-align: middle;   margin-top: -5px;}
+.logo {float: left;margin: 8px 0;position: absolute;  z-index: 8000;}
+.user .photo {width: 50px;height: 50px;border-radius: 50px;overflow: hidden;float: left;}
+.user .photo img  {width: 50px;height: 50px;}
+
+
+/*네비게이션용*/
+body>nav {
+    margin-bottom: -125px;
+    margin-top: 80px;
+}
+
+/** page structure **/
+nav {
+  display: block;
+  width: 100%;
+  height: 47px;
+  background: #ffffff;
+  box-shadow: none;
+    box-sizing: border-box;
+    border-top: 1px solid #e7e7e7;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.wrapper {
+  display: block;
+  margin: 0 auto;
+  width: 1250px;
+}
+
+#menu {
+  display: block;
+  position: relative;
+  z-index: 99;
+  
+}
+
+#menu li {
+  display: block;
+  float: left;
+  
+}
+#menu li a {
+  display: block;
+  position: relative;
+  float: left;
+  padding: 0 35px;
+  font-size: 1.4em;
+  line-height: 45px;
+  /* font-weight: bold; */
+  text-decoration: none;
+  color: #555;
+  min-width: 156px;
+  text-align: center;
+    height: 45px;
+    box-sizing: border-box;
+}
+#menu li a:hover, #menu li a.active {
+  color: #12b9ee;;
+
+    border-bottom: 2px solid #12b9ee;
+/*    outline: 2px solid #12b9ee;*/
+}
+
+#menu li ul {
+  display: none;
+  position: absolute;
+  top: 45px;
+  width: 156px;
+  background: #fff;
+  z-index: -1;
+    color: #555;
+    box-shadow: 0 1px 2px #ddd;
+}
+#menu li ul li {
+  display: block;
+  width: 156px;
+  border-top: 1px solid #e7e7e7;
+}
+#menu li ul li a {
+  display: block;
+  float: none;
+  color: #333;
+  font-size: 1.35em;
+  line-height: 45px;
+  padding: 0 15px;
+  text-align: left;
+}
+#menu li ul li a:hover {
+  background: #fefefe;
+  color: #12b9ee;
+  border-bottom: none;
+}
+
+#menu li ul.expanded {
+  width: 400px;
+}
+#menu li ul.expanded li { margin-right: 200px; }
+
+
+
+#menu li ul li ul {
+  display: none;
+  position: absolute;
+  left: 200px;
+  top: 0;
+  height: 100%;
+  background: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+#menu li ul li ul li a { color: #fff; }
+#menu li ul li ul li a:hover { text-decoration: underline; }
+
+
+
+* html .clearfix { height: 1%; }
+
+
+/*모든 페이지 리스트 공통 사항*/
+.page_title {  color: #000; padding: 13px 0; font-size: 17pt; }
+.page_title a{float: right;font-size: 11pt; cursor: pointer;color: #12b9ee; padding: 5px 0;}
+.page_title a img {vertical-align: middle;}
+
+
+body>.center {
+    min-height: 100%;
+    /* margin: -125px auto -37px; */
+    /* padding: 125px 0 37px; */
+    padding-bottom: 37px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    /* margin: auto; */
+    margin-bottom: -37px;
+/*    float: left;*/
+    left: 50%;
+    position: relative;
+    margin-left: -625px;
+}
+.d_none{ display: none !important;}
+@media screen and (-webkit-min-device-pixel-ratio:0){body>.center {padding-top: 125px;float: left;}}
+.footer {
+    width: 100%;
+    height: 37px;
+    text-align: center;
+    color: #000;
+    font-size: 1.4em;
+    padding: 10px;
+    /* margin-top: -37px; */
+    float: left;
+}
+
+@media (max-width:1250px){
+
+.top .center {width: 100%;}
+body>nav ,body .top_area,.footer{  width: 1250px;}
+   body>.center{
+	left: 0;
+	margin-left: 0
+}
+.user {position: absolute;}
+}

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ko">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE : $DECORATOR_TITLE">clean bank</title>
+    <!-- <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">100min</title> -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/1.11.3/jquery.min.js"
+        th:src="@{/webjars/jquery/1.11.3/jquery.min.js}"></script>
+
+    <link href="../static/css/all.css"
+          th:href="@{/css/all.css}" rel="stylesheet" media="screen"/>
+
+    <!--대쉬보드, 메인페이지를 제외한 모든 페이지에서 필요-->
+    <link href="../static/css/sub.css"
+          th:href="@{/css/sub.css}" rel="stylesheet" media="screen"/>
+
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/cleanbank.js"></script>
+
+    <!--<script layout:fragment="custom-script">
+        console.log('script for page1');
+    </script>-->
+</head>
+<body>
+
+<!-- 상단 네비게이션 -->
+<div class="top_area">
+    <div class="top">
+        <div class="center">
+            <div class="logo">
+                <a href="/dashboard"><img alt="" src="/img/main_logo.png" width="225" /></a>
+            </div>
+            <div class="user">
+<!--                <div class="photo">
+                    &lt;!&ndash;<img alt="" src="/img/example/plofile.png" />&ndash;&gt;
+                    <img th:attr="src=${#authentication.principal.user.picture},title=${#authentication.name},alt=${#authentication.name}" />
+                </div>-->
+
+                <!--<span th:text="${#httpServletRequest.remoteUser}">사용자명</span>-->
+                <span sec:authentication="name">사용자명</span>
+                <!--<span sec:authentication="principal.username">사용자명</span>-->
+                <!--<span sec:authentication="principal.authorities">사용자 정보</span>-->
+                <a class="logout" th:href="@{/logout}" href="logout">로그아웃 <img alt="" src="/img/admin_logout.png" /></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav>
+    <div class="wrapper">
+        <ul id="menu" class="clearfix">
+            <!--<li sec:authorize="hasRole('ROLE_ADMIN')">-->
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/dashboard">대시보드</a>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/order/total/list">주문조회</a>
+                <ul style="display: none;">
+                    <li><a href="/order/total/list">주문전체현황</a></li>
+                    <li><a href="/order/receive/list">주문접수현황</a></li>
+                    <li><a href="/order/finish/list">검수완료현황</a></li>
+                    <li><a href="/order/plan/list">빨래통입고예정현황</a></li>
+                    <li><a href="/order/stock/list">빨래통입고현황</a></li>
+
+                </ul>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/take/order/list">수거</a>
+                <ul style="display: none;">
+                    <li><a href="/take/order/list">주문요청생성</a></li>
+                    <li><a href="/take/assign/list">크린매니저배정</a></li>
+                    <li><a href="/take/extra/list">가용크린매니저현황</a></li>
+                </ul>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/accept/order/list">검수</a>
+                <ul style="display: none;">
+                    <li><a href="/accept/order/list">검수처리</a></li>
+                    <li><a href="/accept/stock/list">공장입고처리</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="/factory/stock/list">공장</a>
+                <ul style="display: none;">
+                    <li><a href="/factory/stock/list">입고현황</a></li>
+                    <li><a href="/factory/process/list">공장처리</a></li>
+                    <li><a href="/factory/delivery/list">출고처리</a></li>
+                </ul>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/delivery/list">배송</a>
+                <ul style="display: none;">
+                    <li><a href="/delivery/list">빨래통입고처리</a></li>
+
+                </ul>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH') || hasRole('ROLE_CODI')">
+                <a href="/claim/list">고객문의</a>
+                <ul style="display: none;">
+                    <li><a href="/claim/list">반품접수</a></li>
+                </ul>
+            </li>
+
+            <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                <a href="/manage/member/list">관리</a>
+                <ul style="display: none;">
+                    <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                        <a href="/manage/member/list">고객관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                        <a href="/manage/employee/list">크린매니저관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/manager/list">관리자계정관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/branch/list">지점관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                        <a href="/manage/business_hours/list">영업시간설정</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/location/list">서비스지역설정</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                        <a href="/manage/promotion/list">프로모션</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/product/list">가격</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/code/list">코드정보관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/partner/list">공장정보관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/log/list">로그현황</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a href="/manage/faq/list">FAQ 관리</a>
+                    </li>
+
+                    <li sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_BRANCH')">
+                        <a href="/manage/jservice/list">상품 관리</a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+<!-- 상단 네비게이션  끝 -->
+
+<!--<div id="admin_section" sec:authorize="hasRole('ROLE_ADMIN')">
+    This content is only shown to administrators.
+</div>-->
+
+<div class="center" layout:fragment="content">
+</div>
+
+<!-- 하단 푸터 -->
+<div class="footer" layout:fragment="footer">
+    <div class="footer_bottom">@2016 Clean Bank Co.,Ltd. All rights reserved</div>
+</div>
+<!-- 하단 푸터 끝 -->
+
+<script type="text/javascript">
+    $(function(){
+        $('a[href="#"]').on('click', function(e){
+            e.preventDefault();
+        });
+
+        $('#menu > li').on('mouseover', function(e){
+            $(this).find("ul:first").show();
+            $(this).find('> a').addClass('active');
+        }).on('mouseout', function(e){
+            $(this).find("ul:first").hide();
+            $(this).find('> a').removeClass('active');
+        });
+
+        $('#menu li li').on('mouseover',function(e){
+            if($(this).has('ul').length) {
+                $(this).parent().addClass('expanded');
+            }
+            $('ul:first',this).parent().find('> a').addClass('active');
+            $('ul:first',this).show();
+        }).on('mouseout',function(e){
+            $(this).parent().removeClass('expanded');
+            $('ul:first',this).parent().find('> a').removeClass('active');
+            $('ul:first', this).hide();
+        });
+    });
+</script>
+
+</body>
+</html>

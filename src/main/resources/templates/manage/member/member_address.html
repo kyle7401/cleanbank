@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/popupLayout">
+<head>
+    <title>주소관리</title>
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="/webjars//js-grid/1.2.0/dist/jsgrid.min.css" rel="stylesheet" media="screen" />
+    <link href="/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css" rel="stylesheet" media="screen" />
+    <script src="/webjars/js-grid/1.2.0/dist/jsgrid.min.js"></script>
+
+    <link href="/jquery-ui-1.11.4.custom/jquery-ui.min.css" rel="stylesheet" media="screen" />
+    <script src="/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+    <link href="/css/address.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .ui-widget *, .ui-widget input, .ui-widget select, .ui-widget button  {
+            font-family: 'Helvetica Neue Light', 'Open Sans', Helvetica;
+            font-size: 14px;
+            font-weight: 300 !important;
+        }
+
+        .details-form-field input,
+        .details-form-field select {
+            width: 250px;
+            float: right;
+        }
+
+        .details-form-field {
+            margin: 30px 0;
+        }
+
+        .details-form-field:first-child {
+            margin-top: 10px;
+        }
+
+        .details-form-field:last-child {
+            margin-bottom: 10px;
+        }
+
+        .details-form-field button {
+            display: block;
+            width: 100px;
+            margin: 0 auto;
+        }
+
+        input.error, select.error {
+            border: 1px solid #ff9999;
+            background: #ffeeee;
+        }
+
+        label.error {
+            float: right;
+            margin-left: 100px;
+            font-size: .8em;
+            color: #ff6666;
+        }
+    </style>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).ready(function(){
+            /*var vMode = [[${mode}]];
+            alert(vMode);*/
+            init();
+        });
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+                width: '100%',
+                height: 'auto',
+                paging: true,
+                pageSize: 5,
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function (args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+                autoload: false,
+                controller: db,
+
+                fields: [
+                    {name: 'title', title: '주소', type: 'text', align: 'center'},
+                    {name: 'buildingAddress', title: '건물 번지', type: 'text', align: 'center'},
+                    {name: 'lat', title: '위도', type: 'text', align: 'center'},
+                    {name: 'lng', title: '경도', type: 'text', align: 'center'}
+                ]
+            });
+
+            $("#detailsDialog").dialog({
+                autoOpen: false,
+                width: 400,
+                close: function() {
+                    $("#detailsForm").validate().resetForm();
+                    $("#detailsForm").find(".error").removeClass("error");
+                }
+            });
+
+            var showDetailsDialog = function (dialogType, client) {
+                $('#txtMbAddr1').val(client.title);
+                $('#txtMbAddr2').val(client.buildingAddress);
+                $('#txtLat').val(client.lat);
+                $('#txtLng').val(client.lng);
+
+//                $("#detailsDialog").dialog("option", "title", dialogType + " Client").dialog("open");
+                $( "#detailsDialog" ).dialog( "open" );
+            };
+
+            /*var showDetailsDialog = function (dialogType, client) {
+                var vAddr = client.title;
+                var vLat = client.lat;
+                var vLng = client.lng;
+                var vMbCd = $('#mbCd').val();
+                var vMode = [[${mode}]];
+                var vId = [[${address.id}]];
+
+                if (client.buildingAddress) vAddr += ' ' + client.buildingAddress;
+
+                var vText = '주소 : ' + vAddr + '\n위도 : ' + vLat + ', 경도 : ' + vLng + '\n주소를 선택 하시겠습니까?';
+                if (!confirm(vText)) return false;
+
+//                저장처리
+                $.ajax({
+                    type: "POST",
+                    url: '/member/saveAddress',
+                    cache: false,
+                    data: {
+                        mbCd: vMbCd,
+                        mbAddr1: client.title,
+                        mbAddr2: client.buildingAddress,
+                        mbLat: vLat,
+                        mbLng: vLng,
+                        mode: vMode,
+                        id: vId
+                    },
+                    success: function (data, status) {
+                        alert("저장 하였습니다!");
+//                        window.location.href = '/manage/member/'+ vMbCd;
+//                        window.location.href = [[${back_url}]];
+                        close();
+                    },
+                    error: function (data, status) {
+                        alert('주소를 저장중 에러가 발생하였습니다.');
+                    }
+                });
+            };*/
+        });
+
+//    http://warmz.tistory.com/739
+        (function() {
+            var db = {
+
+                loadData: function(filter) {
+                    var d = $.Deferred();
+    //                    filter.bnCd = $('#regfrm #bnCd').val();
+    //                alert(filter.q);
+
+                    $.ajax({
+                        url: 'https://apis.daum.net/local/geo/addr2coord?output=json&apikey=208a872a9305a08a345fdfd516e41a86',
+                        dataType: 'jsonp',
+                        data: filter
+                    }).done(function(response) {
+//                        console.log(response.channel.item);
+                        d.resolve(response.channel.item);
+                    });
+
+                    return d.promise();
+                }
+            };
+
+            window.db = db;
+        }());
+
+        function fnSearch() {
+            var vAddr = $('#txtAddress').val();
+//alert(vAddr);
+            $('#jsGrid').jsGrid('search', { q: vAddr });
+        }
+
+        function fnSave() {
+            var vAddr1 = $('#txtMbAddr1').val();
+
+            if(!vAddr1) {
+                alert('저장할 주소를 선택해 주세요!');
+                return;
+            }
+
+            if (!confirm('저장 하시겠습니까?')) return false;
+
+            $.ajax({
+                type: "POST",
+                url: '/member/saveAddress',
+                cache: false,
+                data: {
+                    mbCd: [[${mbCd}]],
+                    mbAddr1: vAddr1,
+                    mbAddr2: $('#txtMbAddr2').val(),
+                    mbLat: $('#txtLat').val(),
+                    mbLng: $('#txtLng').val(),
+                    mode:  [[${mode}]],
+                    id: [[${address.id}]]
+                },
+                success: function (data, status) {
+                    alert("저장 하였습니다!");
+//                        window.location.href = '/manage/member/'+ vMbCd;
+//                        window.location.href = [[${back_url}]];
+                    close();
+                },
+                error: function (data, status) {
+                    alert('주소를 저장중 에러가 발생하였습니다.');
+                }
+            });
+        }
+
+        function init() {
+            /*$('#txtAddress').val('서울 강남구 학동로 107 (논현동, 더 퍼스트 빌딩)');
+            fnSearch();*/
+//            $("#detailsDialog").dialog("option", "title", "Edit Client").dialog("open");
+
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+
+            $('#btnClose').click(function () {
+                close();
+            });
+
+            $('#btnSave').click(function () {
+                fnSave();
+            });
+        }
+
+        function close() {
+            window.location.href = [[${back_url}]];
+        }
+    /*]]>*/
+    </script>
+</head>
+<body class="pop_b">
+
+<div layout:fragment="content">
+    <h2 class="page_title pop">주소 추가</h2>
+
+    <div class="address">
+
+    <form th:object="${member}">
+        <input type="hidden" th:field="*{mbCd}"/>
+
+        <label>아이디</label><!-- th:readonly="${member.mode != 'new'}"-->
+        <input type="text" maxlength="50" class="popup_input" th:field="*{mbEmail}" readonly="readonly" />
+
+        <label>닉네임</label>
+        <input type="text" maxlength="100" class="popup_input" th:field="*{mbNicNm}" readonly="readonly" />
+    </form>
+
+    <input type="text" id="txtAddress" placeholder="주소" class="address_input" th:value="${address.mbAddr}" />
+    <input type="button" onclick="sample2_execDaumPostcode()" value="주소 찾기" />
+    <button id="btnSearch">좌표 검색</button>
+
+    <input type="text" id="txtPostcode" placeholder="우편번호" style="display: none" />
+    <input type="text" id="txtAddressEnglish" placeholder="영문주소" style="display: none" />
+
+    <div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:1;-webkit-overflow-scrolling:touch;">
+        <img src="//i1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnCloseLayer"
+             style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼" />
+    </div>
+
+    <div id="jsGrid" class="table_area"></div>
+
+        <div id="detailsDialog" title="주소 저장" style="display:none">
+            <form id="detailsForm">
+                <div class="details-form-field">
+                    <label for="txtMbAddr1">주소1</label>
+                    <input type="text" id="txtMbAddr1" placeholder="주소1" readonly="readonly" class="" />
+                </div>
+
+                <div class="details-form-field">
+                    <label for="txtMbAddr2">주소2</label>
+                    <input type="text" id="txtMbAddr2" placeholder="주소2" class="" />
+                </div>
+
+                <div class="details-form-field">
+                    <label for="txtLat">위도</label>
+                    <input type="text" id="txtLat" placeholder="위도" readonly="readonly" class="" />
+                </div>
+
+                <div class="details-form-field">
+                    <label for="txtLng">경도</label>
+                    <input type="text" id="txtLng" placeholder="경도" readonly="readonly" class="" />
+                </div>
+
+                <div class="details-form-field">
+                    <button type="button" id="btnSave">저장</button>
+                    <button type="button" id="cancel" onclick="$('#detailsDialog').dialog('close');">취소</button>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="btn_group">
+        <!--<a class="close_btn" id="btnSave">저장</a>
+        <a class="close_btn" id="btnDelete">삭제</a>-->
+        <!--<a class="close_btn" href="회원" th:href="@{/manage/member/{mbrId}(mbrId=${member.mbCd})}">닫기</a>-->
+        <a class="close_btn" id="btnClose">닫기</a>
+    </div>
+</div>
+
+    <script src="https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js"></script>
+    <script>
+        // 우편번호 찾기 화면을 넣을 element
+        var element_layer = document.getElementById('layer');
+
+        function closeDaumPostcode() {
+            // iframe을 넣은 element를 안보이게 한다.
+            element_layer.style.display = 'none';
+        }
+
+        function sample2_execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                    // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                    var fullAddr = data.address; // 최종 주소 변수
+                    var extraAddr = ''; // 조합형 주소 변수
+
+                    // 기본 주소가 도로명 타입일때 조합한다.
+                    if(data.addressType === 'R'){
+                        //법정동명이 있을 경우 추가한다.
+                        if(data.bname !== ''){
+                            extraAddr += data.bname;
+                        }
+                        // 건물명이 있을 경우 추가한다.
+                        if(data.buildingName !== ''){
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+                        fullAddr += (extraAddr !== '' ? ' ('+ extraAddr +')' : '');
+                    }
+
+                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                    /*document.getElementById('txtPostcode').value = data.zonecode; //5자리 새우편번호 사용
+                    document.getElementById('txtAddress').value = fullAddr;
+                    document.getElementById('txtAddressEnglish').value = data.addressEnglish;*/
+
+                    $('#txtAddress').val(fullAddr);
+                    fnSearch();
+
+                    // iframe을 넣은 element를 안보이게 한다.
+                    // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+                    element_layer.style.display = 'none';
+                },
+                width : '100%',
+                height : '100%'
+            }).embed(element_layer);
+
+            // iframe을 넣은 element를 보이게 한다.
+            element_layer.style.display = 'block';
+
+            // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+            initLayerPosition();
+        }
+
+        // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+        // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+        // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+        function initLayerPosition(){
+            var width = 300; //우편번호서비스가 들어갈 element의 width
+            var height = 460; //우편번호서비스가 들어갈 element의 height
+            var borderWidth = 5; //샘플에서 사용하는 border의 두께
+
+            // 위에서 선언한 값들을 실제 element에 넣는다.
+            element_layer.style.width = width + 'px';
+            element_layer.style.height = height + 'px';
+            element_layer.style.border = borderWidth + 'px solid';
+            // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+            element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth) + 'px';
+            element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
+        }
+
+        //        자동으로 실행
+//        window.setTimeout('sample2_execDaumPostcode()', 300);
+//        $('#txtAddress').val('서울 성북구 동소문로 260 (하월곡동, 길음역환승주차장)');
+    </script>
+</div>
+
+</body>
+</html>

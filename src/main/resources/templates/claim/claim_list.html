@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>고객 반품 접수 및 처리</title>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <link href="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap-datepicker-1.5.0/bootstrap-datepicker.ko.min.js"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+        $(document).ready(function(){
+            init();
+        });
+
+        function init() {
+//            http://eternicode.github.io/bootstrap-datepicker/?markup=input&format=&weekStart=&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=2&todayBtn=false&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&keyboardNavigation=on&forceParse=on#sandbox
+            makeDatepicker2('#dtFrom, #dtTo');
+
+//            등록
+            $('#btnRegister').click(function () {
+                window.location.href = '/accept/order/new';
+            });
+
+//            수정
+
+//            검색
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+
+//            엑셀
+            $('#btnExcel').click(function () {
+                var vTac = $('#txtTac').val();
+                var vFrom = $('#dtFrom').val();
+                var vTo = $('#dtTo').val();
+                var vKeyword = $('#txtKeyword').val();
+                var vCondition = $('#cmbCondition').val();
+
+                window.location.href = '/claim/excel?tac='+ vTac +'&from='+ vFrom +'&to='+ vTo +'&keyword='+ vKeyword +'&condition='+ vCondition;
+            });
+
+//            $('#grid').jsGrid('refresh');
+        }
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+//                sorting: true,
+                width: '100%',
+
+//                height: '90%',
+                height: 'auto',
+
+                paging: true,
+                pageSize: [[${@environment.getProperty('js-grid.pageSize')}]],
+//                pagerFormat: 'Pages: {first} {prev} {pages} {next} {last}    {pageIndex} of {pageCount}',
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function(args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+//                data: db.clients,
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    { name: 'IT_CLAIM_DT', title: '반품 일시', type: 'text', align: 'center'},
+                    { name: 'OR_CD2', title: '주문번호', type: 'text', align: 'center'},
+                    { name: 'IT_TAC', title: '택번호', type: 'text', align: 'center'},
+                    { name: 'PD_NM', title: '품목명', type: 'text', align: 'center'},
+                    { name: 'MB_EMAIL', title: '고객 아이디', type: 'text', align: 'center'},
+
+                    { name: 'MB_NIC_NM', title: '닉네임', type: 'text', align: 'center'},
+                    { name: 'MB_TEL', title: '고객 전화번호', type: 'text', align: 'center'},
+
+                    { name: 'EP_CD', title: '수거크린매니저', type: 'text', align: 'center'},
+                    { name: 'DELI_EP', title: '배송크린매니저', type: 'text', align: 'center'},
+                    { name: 'IT_STATUS', title: '주문상태', type: 'text', align: 'center'},
+                    { name: 'IT_MEMO', title: '품목비고', type: 'text', align: 'center'}
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+                window.location.href = '/accept/order/view14/'+ client.orCd;
+            };
+
+        });
+
+        (function() {
+
+            var db = {
+                loadData: function(filter) {
+                    /*return $.ajax({
+                        type: 'GET',
+                        url: '/branch/list',
+                        data: filter,
+                        dataType: 'json'
+                    });*/
+
+                    var d = $.Deferred();
+
+                    $.ajax({
+                        url: '/claim/claim_list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+//                        d.resolve(response.content);
+                        d.resolve(response);
+                    });
+
+                    return d.promise();
+                }
+
+            };
+
+            window.db = db;
+        }());
+
+        function fnSearch() {
+            var vTac = $('#txtTac').val();
+
+            var vFrom = $('#dtFrom').val();
+            var vTo = $('#dtTo').val();
+
+            var vKeyword = $('#txtKeyword').val();
+            var vCondition = $('#cmbCondition').val();
+
+            $('#jsGrid').jsGrid('search', { tac: vTac, from: vFrom, to: vTo, keyword: vKeyword, condition: vCondition });
+        }
+    /*]]>*/
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+    <div class="search_area">
+        <h2 class="page_title">
+            고객 반품 접수 및 처리
+            <a class="yell_btn" id="btnExcel">엑셀</a>
+            <!--<a class="yell_btn" id="btnRegister">주문작성</a>-->
+            <a class="yell_btn" id="btnSearch">조회</a>
+        </h2>
+        <div class="search_input">
+            <label class="front">택번호</label>
+            <input type="text" class="default" id="txtTac" />
+
+            <label>입고일자</label>
+            <input type="text" class="term" id="dtFrom" /> - <input type="text" class="term" id="dtTo" />
+
+            <select id="cmbCondition">
+                <option value="PD_NM">제품명</option>
+            </select>
+            <input type="text" class="default" id="txtKeyword" />
+        </div>
+    </div>
+
+    <div id="jsGrid" class="table_area"></div>
+</div>
+
+</body>
+</html>

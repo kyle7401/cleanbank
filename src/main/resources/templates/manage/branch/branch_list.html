@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>지점</title>
+
+    <link href="/fancyapps-fancyBox-2.1.5/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/fancyapps-fancyBox-2.1.5/jquery.fancybox.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.css"
+          th:href="@{/webjars//js-grid/1.2.0/dist/jsgrid.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid-theme.min.css"
+          th:href="@{/webjars/js-grid/1.2.0/dist/jsgrid-theme.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.2.0/jsgrid.min.js"
+            th:src="@{/webjars/js-grid/1.2.0/dist/jsgrid.min.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+        $(document).ready(function(){
+            init();
+        });
+
+        function init() {
+//            등록
+            $('#btnRegister').click(function () {
+                window.location.href = '/manage/branch/new';
+
+                /*$.fancybox.open({
+                    href : '/manage/branch/new',
+//                    href : 'http://www.picssel.com/playground/jquery/iframDIM01.html',
+                    type : 'iframe',
+                    modal : true,
+                    padding : 0,
+                    width : 470,
+                    height: 530,
+
+                    autoSize: false,
+                    fitToView: false,
+//                    autoHeight: true,
+//                    maxHeight: 400,
+//                    autoHeight: true,
+//                    fitToView   : true,
+//                    autoSize    : false,
+//                    minHeight : 390,
+//                    beforeShow: function(){
+//                        // added 50px to avoid scrollbars inside fancybox
+//                        this.width = ($('.fancybox-iframe').contents().find('html').width())+50;
+//                        this.height = ($('.fancybox-iframe').contents().find('html').height())+50;
+//                    },
+                    afterClose: function () {
+                        fnSearch();
+                    }
+                });*/
+            });
+
+//            수정
+
+//            검색
+            $('#btnSearch').click(function () {
+                fnSearch();
+            });
+
+//            $('#grid').jsGrid('refresh');
+        }
+
+        $(function() {
+
+            $('#jsGrid').jsGrid({
+//                sorting: true,
+                width: '100%',
+
+//                height: '90%',
+                height: 'auto',
+
+                paging: true,
+                pageSize: [[${@environment.getProperty('js-grid.pageSize')}]],
+//                pagerFormat: 'Pages: {first} {prev} {pages} {next} {last}    {pageIndex} of {pageCount}',
+                pagerFormat: '{prev} {pages} {next}',
+                pagePrevText: 'Prev',
+                pageNextText: 'Next',
+
+                rowClick: function(args) {
+                    showDetailsDialog('Edit', args.item);
+                },
+
+//                data: db.clients,
+                autoload: true,
+                controller: db,
+
+                fields: [
+                    { name: 'bnCd', title: '번호', type: 'number', align: 'center'},
+                    { name: 'bnNm', title: '지점명', type: 'text', align: 'center'},
+                    { name: 'bnCeo', title: '지점장', type: 'text', align: 'center'},
+                    { name: 'bnTel', title: '전화번호', type: 'text', align: 'center'},
+                    { name: '', title: '담당지역', type: 'text', align: 'center'}
+                ]
+            });
+
+            var showDetailsDialog = function(dialogType, client) {
+                window.location.href = '/manage/branch/'+ client.bnCd;
+               /* console.log('client : '+ client.id);
+
+                $.fancybox.open({
+                    href : '/manage/branch/'+ client.id,
+                    type : 'iframe',
+                    modal : true,
+                    padding : 0,
+                    width : 470,
+                    height: 530,
+                    autoSize    : false,
+                    fitToView   : false,
+                     afterClose: function () {
+                         fnSearch();
+                     }
+                });*/
+
+               /* $("#name").val(client.Name);
+                $("#age").val(client.Age);
+                $("#address").val(client.Address);
+                $("#country").val(client.Country);
+                $("#married").prop("checked", client.Married);
+
+                formSubmitHandler = function() {
+                    saveClient(client, dialogType === "Add");
+                };
+
+                $("#detailsDialog").dialog("option", "title", dialogType + " Client")
+                        .dialog("open");*/
+            };
+
+        });
+
+        (function() {
+
+            var db = {
+
+                /*loadData: function(filter) {
+                    return $.grep(this.clients, function(client) {
+                        return (!filter.Name || client.Name.indexOf(filter.Name) > -1)
+                                && (!filter.Age || client.Age === filter.Age)
+                                && (!filter.Address || client.Address.indexOf(filter.Address) > -1)
+                                && (!filter.Country || client.Country === filter.Country)
+                                && (filter.Married === undefined || client.Married === filter.Married);
+                    });
+                }*/
+
+                loadData: function(filter) {
+                    /*return $.ajax({
+                        type: 'GET',
+                        url: '/branch/list',
+                        data: filter,
+                        dataType: 'json'
+                    });*/
+
+                    var d = $.Deferred();
+
+                    $.ajax({
+                        url: '/branch/list',
+                        dataType: 'json',
+                        data: filter
+                    }).done(function(response) {
+                        d.resolve(response.content);
+                    });
+
+                    return d.promise();
+                }
+
+            };
+
+            window.db = db;
+
+            db.countries = [
+                { Name: '', Id: 0 },
+                { Name: "United States", Id: 1 },
+                { Name: "China", Id: 6 },
+                { Name: "Russia", Id: 7 }
+            ];
+
+            db.clients = [
+                {
+                    "Name": "Otto Clay",
+                    "Age": 61,
+                    "Country": 6,
+                    "Address": "Ap #897-1459 Quam Avenue",
+                    "Married": false
+                },
+                {
+                    "Name": "Connor Johnston",
+                    "Age": 73,
+                    "Country": 7,
+                    "Address": "Ap #370-4647 Dis Av.",
+                    "Married": false
+                }
+            ];
+
+            db.users = [
+                {
+                    "ID": "x",
+                    "Account": "A758A693-0302-03D1-AE53-EEFE22855556",
+                    "Name": "Carson Kelley",
+                    "RegisterDate": "2002-04-20T22:55:52-07:00"
+                },
+                {
+                    "Account": "D89FF524-1233-0CE7-C9E1-56EFF017A321",
+                    "Name": "Prescott Griffin",
+                    "RegisterDate": "2011-02-22T05:59:55-08:00"
+                }
+            ];
+
+        }());
+
+        function fnSearch() {
+            var vBnNm = $('#txtBnNm').val();
+
+            $('#jsGrid').jsGrid('search', { bnNm: vBnNm });
+        }
+    /*]]>*/
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+    <div class="search_area">
+        <h2 class="page_title">
+            <img src="/img/title_point.png" alt="" /> 지점관리
+            <a class="yell_btn fancybox" id="btnRegister">지점등록</a>
+            <a class="yell_btn" id="btnSearch">조회</a>
+        </h2>
+        <div class="search_input">
+            <label class="front">지점명</label>
+            <input type="text" class="default" id="txtBnNm" />
+        </div>
+    </div>
+
+    <div id="jsGrid" class="table_area"></div>
+</div>
+
+</body>
+</html>

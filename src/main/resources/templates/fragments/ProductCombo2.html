@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<select th:fragment="resultsList">
+    <!--<option th:text="#{select_item}">Select item...</option>-->
+    <option value="">전체</option>
+    <option th:each="item : ${itemList}" th:value="${item.pdLvl2}" th:text="${item.pdNm}">My item</option>
+</select>
+
+</body>
+</html>

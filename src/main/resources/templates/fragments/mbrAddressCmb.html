@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<select th:fragment="resultsList">
+    <!--<option th:text="#{select_item}">Select item...</option>-->
+    <option value="">주소선택</option>
+    <option th:each="item : ${itemList}" th:value="${item.id}" th:text="${item.mbAddr}">My item</option>
+</select>
+
+</body>
+</html>

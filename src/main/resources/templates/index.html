@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorator="layout/commonLayout">
+<head>
+    <title>index</title>
+    <!--<link href="page-style.css" rel="stylesheet" />-->
+
+<!--    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/moment.js"></script>
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/transition.js"
+          th:href="@{/webjars/bootstrap/3.3.5/js/transition.js}"></script>
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/collapse.js"
+          th:href="@{/webjars/bootstrap/3.3.5/js/collapse.js}"></script>
+
+    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/bootstrap_3_datepicker_4.17.37/ko.js"></script>
+
+    <link href="/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.css"
+          th:href="@{/bootstrap_3_datepicker_4.17.37/bootstrap-datetimepicker.min.css}" rel="stylesheet" media="screen"/>-->
+
+    <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.5/js/bootstrap.min.js"
+            th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-timepicker.min.css" />
+    <script type="text/javascript" src="/js/bootstrap-timepicker.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            init();
+        });
+
+        function init() {
+/*            var beepOne = $("#beep-one")[0];
+            beepOne.play();*/
+
+            /*$('#btnSave').click(function () {
+                $('#regfrm').submit();
+            });*/
+
+            //                    http://eonasdan.github.io/bootstrap-datetimepicker/#using-locales
+/*            $('#datetimepicker1, #datetimepicker2').datetimepicker({
+                locale: 'ko',
+                format: 'YYYY-MM-DD HH:mm',
+                sideBySide: true
+            });*/
+
+//            $('#datetimepicker2').datetimepicker();
+        }
+    </script>
+</head>
+<body>
+
+<div class="center" layout:fragment="content">
+
+<!--    <audio id="beep-one" controls="controls" preload="auto">
+        <source src="/img/beep.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+    </audio>-->
+
+    <!--Logged user: <span sec:authentication="name">Bob</span>
+    Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>-->
+
+    <!--
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            관리자
+        </div>
+
+        <div sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ROLE_FACTORY') || hasRole('ROLE_CODI')">
+            관리자,지점장,크린매니저
+        </div>
+
+        <div sec:access="hasRole('ROLE_ADMIN', 'ROLE_BRANCH')">
+            관리자,지점장
+        </div>
+
+        <sec:authorize access="hasRole('ROLE_ADMIN')" var="isAdmin">
+            <div>
+                메뉴권한
+            </div>
+        </sec:authorize>-->
+
+    <!--<sec:intercept-url pattern="/servlet/Download" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH')"/>-->
+
+<!--    <div class="input-group bootstrap-timepicker timepicker">
+        <input id="timepicker1" type="text" class="form-control input-small" />
+        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+    </div>
+
+    <script type="text/javascript">
+//        $('#timepicker1').timepicker();
+        $('#timepicker1').timepicker({showMeridian: false});
+    </script>-->
+
+    <!--사용자명: <span sec:authentication="name">사용자명</span> <br/>
+    권한: <span sec:authentication="principal.authorities">권한</span> <br/>
+    email: <span sec:authentication="principal.user.email">사용자 정보</span> <br/>
+    이미지: <span sec:authentication="principal.user.picture">사용자 이미지</span>-->
+
+    <!--<th:block sec:authentication="principal.user.picture"></th:block>
+
+    <img src="../../images/gtvglogo.png"
+         th:attr="src=${#authentication.principal.user.picture},title=${#authentication.name},alt=${#authentication.name}" />-->
+
+    <!--<div th:text="${#authentication.principal.authorities}">
+        The value of the "name" property of the authentication object should appear here.
+    </div>-->
+
+    <!--https://github.com/thymeleaf/thymeleaf-extras-springsecurity-->
+<!--    <div th:text="${#authentication.principal.user.picture}">
+        The value of the "name" property of the authentication object should appear here.
+    </div>-->
+
+<!--    <sec:authorize access="isAuthenticated()">
+        <div>
+            User: <span sec:authentication="name">miquel</span>
+        </div>
+    </sec:authorize>-->
+
+<!--    Index
+
+    <div class="container">
+        <div class="row">
+            <div class='col-sm-6'>
+                <div class="form-group">
+                    <div class='input-group date' id='datetimepicker1'>
+                        <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='input-group date' id='datetimepicker2'>
+        <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+    </div>-->
+
+</div>
+
+</body>
+</html>

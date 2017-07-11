@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<div class="add_data_area" th:fragment="resultsList">
+
+    <form th:object="${orderitems}" th:action="@{/order/saveOrderItems}" method="post" id="regfrm2" name="regfrm2">
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{orCd}"/>
+        <!--<input type="hidden" th:field="*{orCd}"/>-->
+
+        <input type="hidden" th:field="*{delYn}"/>
+        <input type="hidden" th:field="*{evtNm}"/>
+        <input type="hidden" th:field="*{regiDt}"/>
+        <input type="hidden" th:field="*{user}"/>
+        <input type="hidden" th:field="*{mode}"/>
+
+        <!--
+        `IT_ADD_CHG`          INT           NULL     COMMENT '추가요금'
+        `IT_CLAIM_DT`         DATETIME      NULL     COMMENT '반품일시'
+        `IT_REFUND`           VARCHAR(4)       NULL     COMMENT '환불여부'
+        -->
+
+        <div class="col">
+            <label>택번호</label>
+            <input type="text" class="popup_input" th:field="*{itTac}" />
+        </div>
+        <div class="col">
+            <label>품목명</label>
+            <select class="product_select" th:field="*{pdLvl1}">
+                <!--<option th:text="#{select_item}">Select item...</option>-->
+                <option value="">선택해주세요</option>
+                <option th:each="item : ${pdLvl1s}" th:value="${item.pdLvl1}" th:text="${item.pdNm}">My item</option>
+            </select>
+
+            <select class="product_select" th:field="*{pdLvl2}">
+                <!--<option th:text="#{select_item}">Select item...</option>-->
+                <!--<option th:each="item : ${itemList}" th:value="${item.id}" th:text="${item.pdNm}">My item</option>-->
+            </select>
+
+            <select class="product_select" th:field="*{pdLvl3}">
+                <!--<option>프리미엄</option>
+                <option>일반</option>-->
+            </select>
+        </div>
+        <div class="col harf">
+            <label>가격</label>
+            <input type="text" class="popup_input" th:field="*{itPrice}" />
+        </div>
+        <div class="col harf">
+            <label>수량</label>
+            <input type="text" class="popup_input" th:field="*{itCnt}" />
+        </div>
+        <div class="col harf">
+            <label>브랜드</label>
+            <input type="text" class="popup_input" th:field="*{itBrand}" />
+        </div>
+        <div class="col harf">
+            <label>색상</label>
+            <input type="text" class="popup_input" th:field="*{itColor}" />
+        </div>
+        <div class="col harf">
+            <label>무늬</label>
+            <input type="text" class="popup_input" th:field="*{itPatten}" />
+        </div>
+        <div class="col">
+            <label>진행상태</label>
+            <select th:field="*{itStatus}">
+                <option value="1">주문접수</option>
+                <option value="2">수거 중</option>
+                <option value="3">수거완료</option>
+                <option value="4">검수완료</option>
+                <option value="5">공장입고</option>
+                <option value="6">세탁 중</option>
+                <option value="7">공장출고</option>
+                <option value="8">빨래통입고</option>
+                <option value="9">배송 중</option>
+                <option value="10">배송완료</option>
+            </select>
+        </div>
+        <div class="col">
+            <label>세탁내용</label>
+            <input type="text" class="popup_input" th:field="*{itClMemo}" />
+        </div>
+        <div class="col">
+            <label>수거지 주소</label>
+            <!--<input type="text" class="popup_input" th:field="*{itReqAddr}" />-->
+            <select  th:field="*{itReqAddr}">
+                <!--<option th:text="#{select_item}">Select item...</option>-->
+                <option th:each="item : ${address}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+            </select>
+        </div>
+        <div class="col">
+            <label>배송지 주소</label>
+            <!--<input type="text" class="popup_input" th:field="*{itDeliAddr}" />-->
+            <select  th:field="*{itReqAddr}">
+                <!--<option th:text="#{itDeliAddr}">Select item...</option>-->
+                <option th:each="item : ${address}" th:value="${item[0]}" th:text="${item[1]}">My item</option>
+            </select>
+        </div>
+        <div class="col harf">
+            <label>수거요청일</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itReqDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col harf">
+            <label>수거일자</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itVisitDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col harf">
+            <label>세탁입고일</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itInDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col harf">
+            <label>세탁출고일</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itOutDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col harf">
+            <label>배송예정일</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itDeliFuVisitDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col harf">
+            <label>배송일자</label>
+            <div class="input-group date">
+                <input type="text" maxlength="10" class="popup_input" th:field="*{itDeliVisitDt}" />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+        <div class="col">
+            <label>반품 여부</label>
+            <input type="checkbox" value="Y" th:field="*{itClaim}"  />
+        </div>
+        <div class="col product_note">
+            <label>품목비고</label>
+            <textarea th:field="*{itMemo}"></textarea>
+        </div>
+        <div class="col">
+            <label class="order_photo edit">사진정보</label>
+            <div class="order_photo_area">
+                <!--<img src="/img/example/order_photo1.png" alt="" />
+                <a>사진선택</a>-->
+                <img src="/img/example/order_photo.png" alt="" />
+                <span id="spnImgNm1"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="사진선택" class="file_input_hidden" id="imgfile1" name="imgfile1"
+                           onchange="javascript:$('#spnImgNm1').text(this.value);" />
+                </div>
+            </div>
+            <div class="order_photo_area">
+                <img src="/img/example/order_photo.png" alt="" />
+                <span id="spnImgNm2"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="사진선택" class="file_input_hidden" id="imgfile2" name="imgfile2"
+                           onchange="javascript:$('#spnImgNm2').text(this.value);" />
+                </div>
+            </div>
+            <div class="order_photo_area">
+                <img src="/img/example/order_photo.png" alt="" />
+                <span id="spnImgNm3"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="사진선택" class="file_input_hidden" id="imgfile3" name="imgfile3"
+                           onchange="javascript:$('#spnImgNm3').text(this.value);" />
+                </div>
+            </div>
+            <div class="order_photo_area">
+                <img src="/img/example/order_photo.png" alt="" />
+                <span id="spnImgNm4"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="사진선택" class="file_input_hidden" id="imgfile4" name="imgfile4"
+                           onchange="javascript:$('#spnImgNm4').text(this.value);" />
+                </div>
+            </div>
+            <div class="order_photo_area">
+                <img src="/img/example/order_photo.png" alt="" />
+                <span id="spnImgNm5"></span>
+                <div class="file_input_div">
+                    <input type="button" value="사진선택" class="file_input_button" />
+                    <input type="file" title="사진선택" class="file_input_hidden" id="imgfile5" name="imgfile5"
+                           onchange="javascript:$('#spnImgNm5').text(this.value);" />
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</body>
+</html>
